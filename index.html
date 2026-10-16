@@ -89,6 +89,15 @@ button { font:inherit; color:inherit; }
 .fila { display:grid; gap:0 44px; padding:26px 0 30px; border-bottom:1px solid var(--filete); }
 .fila:last-child { border-bottom:0; }
 .situacion { grid-template-columns:1fr 1fr 1.25fr; }
+.franja-in { max-width:1320px; margin:0 auto; padding:14px 40px; display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:14px 24px; }
+.franja-f .filtros { margin:0; padding:0; max-width:none; }
+.indic { display:flex; gap:0; align-items:flex-end; }
+.kc { padding:0 16px; border-left:1px solid var(--filete); min-width:0; }
+.kc:first-child { border-left:0; padding-left:0; } .kc:last-child { padding-right:0; }
+.k-n { font-family:var(--f-display); font-weight:400; font-size:26px; line-height:1.05; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.k-n small { font-size:15px; color:var(--tinta-2); }
+.k-t { font-size:13px; font-weight:600; margin-top:3px; }
+.k-s { font-size:12px; color:var(--tinta-2); margin-top:1px; }
 .dos-c { grid-template-columns:1.35fr 1fr; }
 .fila > .bloque { min-width:0; }
 .fila > .bloque + .bloque { border-left:1px solid var(--filete); padding-left:44px; }
@@ -189,6 +198,8 @@ button { font:inherit; color:inherit; }
 
 @media (max-width:1050px) {
     .situacion, .dos-c { grid-template-columns:1fr; }
+    .franja-in { padding-left:24px; padding-right:24px; } .indic { width:100%; }
+    .kc { flex:1 1 0; }
     .fila > .bloque + .bloque { border-left:0; padding-left:0; border-top:1px solid var(--filete); margin-top:26px; padding-top:24px; }
     .det { grid-template-columns:1fr; }
     .rej { min-width:0; }
@@ -198,8 +209,10 @@ button { font:inherit; color:inherit; }
     .g-cli > :nth-child(5) { text-align:left; }
 }
 @media (max-width:700px) {
-    .cabecera, .tabs, .filtros, .lienzo, .pie { padding-left:16px; padding-right:16px; }
+    .cabecera, .tabs, .lienzo, .pie { padding-left:16px; padding-right:16px; }
     .dwrap { flex-direction:column; align-items:flex-start; }
+    .franja-in { padding-left:16px; padding-right:16px; }
+    .kc { padding:0 10px; } .k-n { font-size:22px; } .k-n small { font-size:12px; } .k-t { font-size:12px; }
     .dl { width:100%; }
 }
 </style>
@@ -236,7 +249,14 @@ button { font:inherit; color:inherit; }
 </section>
 
 <div id="vista" data-tablero="entregas" hidden>
-  <div class="franja-f"><div class="filtros" id="filtros"></div></div>
+  <div class="franja-f"><div class="franja-in">
+    <div class="filtros" id="filtros"></div>
+    <div class="indic" id="indic" aria-label="Avance del día">
+      <div class="kc" title="Rutas cerradas más rutas en curso, sobre el total de rutas"><div class="k-n" id="kCumpl"></div><div class="k-t">Cumplimiento</div><div class="k-s" id="kCumplS"></div></div>
+      <div class="kc"><div class="k-n" id="kRuta"></div><div class="k-t">Tiempo promedio de ruta</div><div class="k-s" id="kRutaS"></div></div>
+      <div class="kc"><div class="k-n" id="kTienda"></div><div class="k-t">Tiempo promedio por tienda</div><div class="k-s" id="kTiendaS"></div></div>
+    </div>
+  </div></div>
   <main class="lienzo">
     <section class="fila situacion">
       <div class="bloque"><h2>Rutas</h2><div class="sub-b" id="subRutas"></div><div id="donutRutas"></div></div>
@@ -246,9 +266,8 @@ button { font:inherit; color:inherit; }
     <section class="fila">
       <div class="bloque"><h2>Clientes</h2><div class="sub-b">Abre un cliente para ver sus pilotos, primero los que no han salido</div><div id="clientes"></div></div>
     </section>
-    <section class="fila dos-c">
+    <section class="fila">
       <div class="bloque"><h2>Ritmo del día</h2><div class="sub-b">Tiendas entregadas por hora y cliente. Más oscuro, más entregas</div><div class="mapa" id="horas"></div></div>
-      <div class="bloque"><h2>Rutas cerradas</h2><div class="sub-b">De la más larga a la más corta, con su kilometraje</div><div id="cerradas"></div></div>
     </section>
     <section class="fila dos-c">
       <div class="bloque" id="noEnt"></div>
@@ -465,6 +484,25 @@ button { font:inherit; color:inherit; }
     $("donutTiendas").innerHTML = '<div class="dwrap">' + donut(pt, T.paradas, (T.paradas ? Math.round(100 * T.ent / T.paradas) : 0) + "%", "entregadas") + leyendaDonut(pt, T.paradas) + "</div>";
   }
 
+  /* Avance del día: cumplimiento y tiempos promedio */
+  function pintarIndic(C) {
+    const T = C.T, salio = T.cer + T.cur, pct = T.rutas ? Math.round(100 * salio / T.rutas) : 0;
+    $("kCumpl").innerHTML = pct + "<small> %</small>";
+    $("kCumplS").textContent = T.rutas ? salio + " de " + T.rutas + " rutas" : "Sin rutas con estos filtros";
+    const L = C.rs.filter(({ r }) => r.est === "cer" && r.dur > 0);
+    const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+    if (!L.length) {
+      $("kRuta").textContent = "—"; $("kTienda").textContent = "—";
+      $("kRutaS").textContent = "Solo rutas cerradas"; $("kTiendaS").textContent = "Solo rutas cerradas";
+      return;
+    }
+    const porT = L.map(({ r }) => ({ d: r.dur, e: r.stops.filter((s) => s.e === 1).length })).filter((x) => x.e > 0).map((x) => x.d / x.e);
+    $("kRuta").textContent = durTxt(mean(L.map(({ r }) => r.dur)));
+    $("kRutaS").textContent = "Solo rutas cerradas";
+    $("kTienda").innerHTML = porT.length ? Math.round(mean(porT)) + "<small> min</small>" : "—";
+    $("kTiendaS").textContent = "Solo rutas cerradas";
+  }
+
   /* Pilotos por llamar */
   function pilotosLlamar(C) {
     const hoy = hoyGT(); if (![...S.F.fe.sel].includes(hoy)) return null;
@@ -537,21 +575,6 @@ button { font:inherit; color:inherit; }
   }
 
   /* Rutas cerradas: duración y kilómetros */
-  function pintarCerradas(C) {
-    const L = C.rs.filter(({ r }) => r.est === "cer").map(({ r, st }) => ({ r, ent: st.filter((s) => s.e === 1).length, tot: st.length }));
-    if (!L.length) { $("cerradas").innerHTML = '<div class="vacio">Todavía no ha cerrado ninguna ruta.</div>'; return; }
-    const conDur = L.filter((x) => x.r.dur), med = mediana(conDur.map((x) => x.r.dur));
-    const rate = mediana(conDur.filter((x) => x.ent > 0).map((x) => x.ent / (x.r.dur / 60)));
-    const kms = L.filter((x) => x.r.km > 0), kmTot = kms.reduce((a, x) => a + x.r.km, 0);
-    const orden = L.slice().sort((a, b) => (b.r.dur || -1) - (a.r.dur || -1) || (b.r.km || 0) - (a.r.km || 0));
-    const maxD = Math.max(1, ...conDur.map((x) => x.r.dur));
-    const lim = S.todasCerradas ? orden.length : 10;
-    $("cerradas").innerHTML = '<div class="res"><div><b>' + L.length + '</b><span>cerradas</span></div><div><b>' + durTxt(med) + '</b><span>duración típica</span></div><div><b>' + (rate ? fmt1(rate) : "—") + '</b><span>tiendas por hora, típico</span></div><div><b>' + (kms.length ? fmt(Math.round(kmTot)) : "—") + '</b><span>' + (kms.length ? "km en " + rutasTxt(kms.length) : "km: SimpliRoute aún no los llena") + "</span></div></div>" +
-      '<div class="rejc"><div class="rej-f g-cer cab"><div>Camión</div><div>Salió</div><div>Cerró</div><div>Duración</div><div class="n">Tiendas</div><div class="n">Km</div></div>' +
-      orden.slice(0, lim).map((x) => '<div class="rej-f g-cer"><div class="nom"><b>' + esc(x.r.placa ? "Camión " + x.r.placa : "Ruta " + x.r.id.slice(0, 6)) + "</b><small>" + esc(x.r.piloto || "Sin piloto") + "</small></div><div>" + esc(x.r.ini || "—") + "</div><div>" + esc(x.r.fin || "—") + '</div><div class="durb"><span class="t">' + esc(durTxt(x.r.dur)) + '</span><div class="mini">' + (x.r.dur ? '<i style="width:' + (100 * x.r.dur / maxD).toFixed(1) + '%"></i>' : "") + (med && x.r.dur ? '<u style="left:' + (100 * med / maxD).toFixed(1) + '%"></u>' : "") + "</div></div><div class=\"n\">" + x.ent + '</div><div class="n">' + (x.r.km > 0 ? fmt1(x.r.km) : "—") + "</div></div>").join("") + "</div>" +
-      '<div class="nota">La marca vertical es la duración típica.' + (orden.length > 10 ? ' <button type="button" class="mas" data-mascerradas="1" style="padding:0 0 0 6px">' + (S.todasCerradas ? "Ver menos" : "Ver las " + orden.length) + "</button>" : "") + "</div>";
-  }
-
   /* Para revisar */
   function pintarRevisar(C) {
     const no = []; C.rs.forEach(({ r, st }) => st.forEach((s) => { if (s.e === 2) no.push({ r, s }); }));
@@ -577,7 +600,7 @@ button { font:inherit; color:inherit; }
     if (!S.M) return;
     pintarFiltros();
     const C = calcular();
-    pintarSituacion(C); pintarLlamar(C); pintarClientes(C); pintarHoras(C); pintarCerradas(C); pintarRevisar(C); diagnostico(C);
+    pintarIndic(C); pintarSituacion(C); pintarLlamar(C); pintarClientes(C); pintarHoras(C); pintarRevisar(C); diagnostico(C);
     $("subtitulo").textContent = "Entregas del día" + (C.T.rutas ? ": " + fmt(C.T.rutas) + (C.T.rutas === 1 ? " ruta" : " rutas") : "");
   }
   function pintarEdad() {
@@ -635,7 +658,6 @@ button { font:inherit; color:inherit; }
   document.addEventListener("click", (e) => { if (S.menu && e.target && e.target.closest && !e.target.closest(".campo")) { S.menu = null; pintar(); } });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.menu) { S.menu = null; pintar(); } });
   $("llamar").addEventListener("click", (e) => { if (e.target.closest("[data-masllamar]")) { S.todosLlamar = !S.todosLlamar; pintar(); } });
-  $("cerradas").addEventListener("click", (e) => { if (e.target.closest("[data-mascerradas]")) { S.todasCerradas = !S.todasCerradas; pintar(); } });
   $("clientes").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.closest && e.target.closest("[data-rp]")) { e.preventDefault(); e.target.closest("[data-rp]").click(); } });
   $("clientes").addEventListener("click", (e) => {
     const p = e.target.closest("[data-rp]"); if (p) { const k = p.dataset.rp; if (S.abiertosP.has(k)) S.abiertosP.delete(k); else S.abiertosP.add(k); guardarPrefs(); pintar(); return; }
