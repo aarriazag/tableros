@@ -23,7 +23,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 SR = "https://api.simpliroute.com/v1/"
 TOKEN = os.environ.get("SR_TOKEN", "").strip()
 CLAVE = os.environ.get("CLAVE", "").strip()
-DIAS = int(os.environ.get("DIAS", "3"))  # hoy y los días anteriores que se publican
+DIAS = int(os.environ.get("DIAS", "8"))  # hoy y los 7 días anteriores (una semana + 1, para comparar contra el mismo día de la semana pasada)
 ITERACIONES = 250000                      # debe ser igual al de index.html
 AQUI = os.path.dirname(os.path.abspath(__file__))
 SALIDA = os.path.join(AQUI, "site")
@@ -100,11 +100,14 @@ def main():
         sys.exit("Faltan los secretos SR_TOKEN y/o CLAVE en GitHub (Settings > Secrets and variables > Actions).")
     if len(CLAVE) < 10:
         sys.exit("La CLAVE es muy corta: usa al menos 10 caracteres, porque protege los datos.")
+    t0 = time.time()
     datos = construir()
     os.makedirs(SALIDA, exist_ok=True)
     with open(os.path.join(SALIDA, "datos.bin"), "wb") as f:
         f.write(cifrar(datos, CLAVE))
+    kb = os.path.getsize(os.path.join(SALIDA, "datos.bin")) / 1024
     print(f"Listo: {len(datos['visitas'])} visitas y {len(datos['rutas'])} rutas de {', '.join(datos['fechas'])}.")
+    print(f"Prueba de una semana: {DIAS} días, archivo de {kb:.0f} KB, {time.time() - t0:.0f} segundos.")
 
 
 if __name__ == "__main__":
