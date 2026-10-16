@@ -3,790 +3,655 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
 <title>Ransa · Tableros</title>
 <style>
-  :root { --papel:#EDF1EC; --blanco:#FFFFFF; --tinta:#13241B; --tinta2:#52615A; --regla:#C9D2CB; --verde:#17A673; --verde2:#0B4A32; --naranja:#D9824F; --rojo:#C8372D; }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--papel); color: var(--tinta); font-family: "Tenorite Display","Myriad Pro","Segoe UI",system-ui,sans-serif; line-height: 1.35; }
-  button, input { font-family: inherit; }
-  .cab { background: var(--verde2); color: #fff; }
-  .cab-in { max-width: 1180px; margin: 0 auto; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 28px; }
-  h1 { font-size: 1.5rem; font-weight: 600; margin: 0; letter-spacing: -.01em; }
-  #sub { margin: 2px 0 0; font-size: .88rem; color: #BFE3D3; min-height: 1.2em; }
-  .vivo { display: flex; align-items: center; gap: 8px; font-size: .88rem; }
-  .punto { width: 10px; height: 10px; border-radius: 50%; background: #8FA89C; flex: 0 0 auto; }
-  .punto.on { background: #4DE0A8; animation: lat 1.8s ease-in-out infinite; }
-  .punto.err { background: #FF8A7A; }
-  @keyframes lat { 50% { opacity: .35; } }
-  @media (prefers-reduced-motion: reduce) { .punto.on { animation: none; } .celda { transition: none; } }
-  .ctl { display: flex; align-items: center; gap: 8px; font-size: .85rem; }
-  .ctl input[type=date] { padding: 5px 8px; border: 1px solid #3F7A62; border-radius: 6px; background: #0F5A3E; color: #fff; font-size: .85rem; color-scheme: dark; }
-  .btn { background: var(--verde); color: #fff; border: 0; border-radius: 6px; padding: 7px 14px; font-weight: 600; font-size: .85rem; cursor: pointer; }
-  .btn.claro { background: transparent; color: #fff; border: 1px solid #5FA487; }
-  .btn.sec { background: transparent; color: var(--tinta); border: 1px solid var(--regla); }
-  .btn:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--naranja); outline-offset: 2px; }
-  .regla { height: 6px; background: linear-gradient(90deg, var(--naranja) 0 50%, var(--verde) 50% 100%); }
-  .sec { max-width: 1180px; margin: 0 auto; padding: 18px 16px 8px; }
-  .sec + .sec { border-top: 1px solid var(--regla); }
-  h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 10px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
-  h2 .nota { font-size: .82rem; font-weight: 400; color: var(--tinta2); }
-  label { cursor: pointer; }
-  .aj { max-width: 1180px; margin: 10px auto 0; padding: 0 16px; }
-  .aj summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
-  .aj select { width: 100%; padding: 7px 9px; border: 1px solid var(--regla); border-radius: 6px; font-size: .88rem; background: var(--blanco); color: var(--tinta); }
-  .aj .fila { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 10px 0; }
-  .aj label { display: block; font-size: .76rem; color: var(--tinta2); margin-bottom: 3px; cursor: default; }
-  .aj input[type=text], .aj input[type=password], .aj input[type=date] { width: 100%; padding: 7px 9px; border: 1px solid var(--regla); border-radius: 6px; font-size: .88rem; background: var(--blanco); color: var(--tinta); }
-  .msg { max-width: 1180px; margin: 10px auto 0; padding: 9px 14px; border-left: 5px solid var(--naranja); background: #FBEEE5; font-size: .88rem; }
-  .filtros { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; font-size: .86rem; }
-  .filtros .grp { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-  .filtros .tit { color: var(--tinta2); margin-right: 2px; }
-  .pil { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--regla); border-radius: 999px; padding: 3px 11px 3px 8px; background: var(--blanco); }
-  .pil:has(input:checked) { border-color: var(--verde); background: #E3F5ED; }
-  .pil small { color: var(--tinta2); }
-  .pil input, .cli-n input { accent-color: var(--verde); width: 16px; height: 16px; margin: 0; cursor: pointer; }
-  .filtros input[type=date] { padding: 4px 7px; border: 1px solid var(--regla); border-radius: 6px; background: var(--blanco); color: var(--tinta); font-size: .86rem; }
-  .resumen-top { background: var(--blanco); border-bottom: 1px solid var(--regla); }
-  .rt { max-width: 1180px; margin: 0 auto; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 8px 44px; font-variant-numeric: tabular-nums; }
-  .rt b { font-size: 2rem; font-weight: 600; line-height: 1; }
-  .rt span { margin-left: 8px; color: var(--tinta2); font-size: .9rem; }
-  .rt .mal b { color: var(--rojo); }
-  .cb { display: flex; align-items: center; gap: 6px; }
-  .cb-w { position: relative; }
-  .cb-b { background: var(--blanco); border: 1px solid var(--regla); border-radius: 6px; padding: 5px 10px; font-size: .86rem; cursor: pointer; color: var(--tinta); min-width: 9.5rem; display: flex; justify-content: space-between; gap: 8px; text-align: left; }
-  .cb-b[aria-expanded="true"] { border-color: var(--verde); }
-  .cb-p { position: absolute; top: calc(100% + 4px); left: 0; z-index: 20; min-width: 15rem; max-height: 18rem; overflow: auto; background: var(--blanco); border: 1px solid var(--regla); box-shadow: 0 6px 18px rgba(19,36,27,.16); padding: 6px; }
-  .op { display: flex; align-items: center; gap: 8px; padding: 6px 8px; font-size: .88rem; cursor: pointer; }
-  .op:hover { background: var(--papel); }
-  .op input { accent-color: var(--verde); width: 16px; height: 16px; margin: 0; }
-  .op small { margin-left: auto; color: var(--tinta2); }
-  .filtros input[type=time] { padding: 3px 6px; border: 1px solid var(--regla); border-radius: 6px; font-size: .86rem; background: var(--blanco); color: var(--tinta); }
+/* Concepto: torre de control del muelle. La hoja abre con lo que hay que hacer ahora (los pilotos que no han
+   salido) y la barra de salidas: cada ruta es un bulto en la caja del camión, acero si ya cerró, verde si va en
+   camino y naranja rayado si sigue en el muelle. Abajo, la hoja de operación con el título de cada sección en el
+   margen. Mismo lenguaje del Dashboard general. */
+:root {
+    --fondo:#FFFFFF; --panel:#F3F6F5; --tinta:#14262B; --tinta-2:#51636A; --filete:#D6DCD9; --filete-suave:#E9EDEB; --borde-campo:#BCC6C2;
+    --verde:#00983A; --naranja:#F29100; --acero:#35596E; --ok:#00983A; --mal:#B3261E; --punto:#9AA8A3;
+    --c-cerrada:#35596E; --c-curso:#00983A; --c-sin:#F29100; --hueco:#FFFFFF; --sombra:rgba(10,20,24,.18); --aviso-bg:#FFF4E0; --hover:#F3F6F5;
+    --f-display:"Tenorite Display","Segoe UI Semibold","Segoe UI",Calibri,Arial,sans-serif;
+    --f-texto:"Myriad Pro","Segoe UI",Calibri,Arial,sans-serif;
+    color-scheme:light;
+}
+@media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) {
+    --fondo:#000000; --panel:#111415; --tinta:#EEF2F3; --tinta-2:#9DAEB4; --filete:#2B3134; --filete-suave:#1B2023; --borde-campo:#3B4448;
+    --ok:#2FBF6C; --mal:#FF9189; --punto:#5D6B70; --c-cerrada:#8CC0D8; --c-curso:#2FBF6C; --hueco:#000000; --sombra:rgba(0,0,0,.7); --aviso-bg:#2A1E08; --hover:#111415;
+    color-scheme:dark;
+} }
+:root[data-theme="dark"] {
+    --fondo:#000000; --panel:#111415; --tinta:#EEF2F3; --tinta-2:#9DAEB4; --filete:#2B3134; --filete-suave:#1B2023; --borde-campo:#3B4448;
+    --ok:#2FBF6C; --mal:#FF9189; --punto:#5D6B70; --c-cerrada:#8CC0D8; --c-curso:#2FBF6C; --hueco:#000000; --sombra:rgba(0,0,0,.7); --aviso-bg:#2A1E08; --hover:#111415;
+    color-scheme:dark;
+}
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+body { margin:0; background:var(--fondo); color:var(--tinta); font-family:var(--f-texto); font-size:14px; line-height:1.4; padding:24px 20px 48px; }
+.pagina { max-width:1320px; margin:0 auto; }
+h1, h2, h3, .num, .gran { font-family:var(--f-display); }
+button { font:inherit; color:inherit; }
+:focus-visible { outline:2px solid var(--naranja); outline-offset:2px; }
 
-  /* Rutas por cliente: cada ruta es un tramo de la cinta */
-  .cli-wrap { border-bottom: 1px solid var(--regla); }
-  .cli-wrap:last-child { border-bottom: 0; }
-  .cli { display: grid; grid-template-columns: minmax(10rem, 15rem) 1fr auto; align-items: center; gap: 6px 18px; padding: 11px 0; }
-  .cli.off { opacity: .45; }
-  .cli-n { display: flex; align-items: center; gap: 9px; font-size: 1.05rem; font-weight: 600; }
-  .cinta { display: flex; flex-wrap: wrap; gap: 3px; }
-  .seg { width: 17px; height: 24px; border-radius: 2px; background: var(--verde); }
-  .seg.fin { background: var(--verde2); }
-  .seg.no { background: repeating-linear-gradient(135deg, transparent 0 3px, #F0C9B0 3px 5px); box-shadow: inset 0 0 0 1.5px var(--naranja); }
-  .cifra { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .cifra b { font-size: 1.7rem; font-weight: 600; line-height: 1; }
-  .cifra span { font-size: .88rem; color: var(--tinta2); }
-  .cifra .falta { display: block; font-size: .86rem; font-weight: 600; color: #B5622F; }
-  .cifra .falta.cero { color: var(--verde2); }
-  .abrir { background: none; border: 0; padding: 4px 0 0; color: var(--verde2); font-weight: 600; font-size: .82rem; cursor: pointer; }
-  .cli-det { padding: 0 0 12px 25px; }
-  .sub-t { font-weight: 600; font-size: .86rem; margin: 8px 0 4px; }
-  .dp { cursor: pointer; display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; margin-bottom: 4px; background: var(--blanco); border-left: 5px solid var(--verde); }
-  .dp.no { border-left-color: var(--naranja); }
-  .dp b { font-weight: 600; display: block; }
-  .dp small { color: var(--tinta2); font-size: .8rem; }
-  .dp .car { color: var(--tinta2); margin-right: 6px; font-size: .8rem; }
-  .tiendas { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px; padding: 2px 0 8px 17px; }
-  .tn { display: flex; justify-content: space-between; gap: 8px; border: 1px solid; border-radius: 3px; padding: 4px 8px; font-size: .82rem; background: var(--blanco); }
-  .tn span:last-child { font-variant-numeric: tabular-nums; text-align: right; }
-  .tn.ok { background: #D9F1E6; border-color: var(--verde); }
-  .tn.mal { background: #F8DDD9; border-color: var(--rojo); }
-  .tn.pen { border-color: var(--regla); color: var(--tinta2); }
-  .dp .d { text-align: right; font-size: .84rem; color: var(--tinta2); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  @media (max-width: 640px) { .cli { grid-template-columns: 1fr auto; } .cinta { grid-column: 1 / -1; order: 3; } }
+/* ---------- Cabecera ---------- */
+.membrete { display:flex; height:8px; }
+.membrete i { display:block; }
+.membrete i:first-child { background:var(--naranja); flex:0 0 26%; }
+.membrete i:last-child { background:var(--verde); flex:1; }
+.noche { border-bottom:1px solid var(--filete); }
+.noche-in { padding:0 40px 8px; }
+.cabecera { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px 24px; padding:24px 0 14px; }
+.cab-izq { display:flex; align-items:center; gap:20px; min-width:0; }
+.logo-placa { background:#fff; border:1px solid var(--filete); padding:9px 14px; display:flex; }
+.logo-placa img { height:34px; width:auto; display:block; }
+.cab-izq h1 { margin:0; font-size:26px; font-weight:400; letter-spacing:.005em; line-height:1.1; }
+.cab-izq .sub { font-size:13.5px; color:var(--tinta-2); margin-top:3px; }
+.cab-der { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; font-size:13px; color:var(--tinta-2); }
+.estado { display:inline-flex; align-items:center; gap:8px; font-weight:600; color:var(--tinta-2); }
+.estado::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--punto); }
+.estado.ok { color:var(--ok); } .estado.ok::before { background:var(--ok); }
+.estado.mal { color:var(--mal); } .estado.mal::before { background:var(--mal); }
+.btn-s { font-size:13px; font-weight:600; color:var(--tinta); background:var(--fondo); border:1px solid var(--borde-campo); border-radius:3px; padding:0 12px; height:30px; cursor:pointer; }
+.btn-s:hover { border-color:var(--tinta); }
+.tabs { display:flex; flex-wrap:wrap; gap:4px; }
+.tabs button { background:none; border:0; border-bottom:3px solid transparent; padding:8px 4px 7px; margin-right:18px; font-size:14.5px; color:var(--tinta-2); cursor:pointer; }
+.tabs button[aria-selected="true"] { color:var(--tinta); font-weight:600; border-bottom-color:var(--naranja); }
+.aviso { margin:12px 0 4px; background:var(--aviso-bg); border:1px solid var(--naranja); padding:10px 14px; font-size:13px; }
 
-  /* Pilotos a llamar */
-  .llamar .p { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; margin-bottom: 6px; background: var(--blanco); border-left: 6px solid var(--naranja); }
-  .llamar .p b { font-size: 1.08rem; font-weight: 600; display: block; }
-  .llamar .p small { color: var(--tinta2); font-size: .82rem; }
-  .llamar .p .d { text-align: right; font-variant-numeric: tabular-nums; font-size: .86rem; color: var(--tinta2); white-space: nowrap; }
-  .ok-vacio { padding: 10px 0; color: var(--verde2); font-weight: 600; }
-  .vacio { padding: 8px 0; color: var(--tinta2); font-size: .88rem; }
-  .al { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--regla); font-size: .9rem; }
-  .al:last-child { border-bottom: 0; }
-  .al small { display: block; color: var(--tinta2); font-size: .78rem; }
-  .al .m { width: 9px; height: 9px; border-radius: 50%; margin: 6px 10px 0 0; flex: 0 0 auto; }
-  .al .m.alto { background: var(--rojo); } .al .m.medio { background: var(--naranja); } .al .m.bajo { background: #9AA79F; }
-  .al .d { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--tinta2); }
+/* ---------- Acceso ---------- */
+.acceso { max-width:420px; margin:70px auto; padding:0 20px; }
+.acceso h2 { font-size:22px; font-weight:600; margin:0 0 6px; }
+.acceso p { margin:0 0 16px; color:var(--tinta-2); }
+.acceso .fila-a { display:flex; gap:8px; }
+.acceso input { flex:1; min-width:0; height:38px; border:1px solid var(--borde-campo); border-radius:3px; padding:0 12px; font:inherit; font-size:15px; background:var(--fondo); color:var(--tinta); }
+.acceso .ir { height:38px; padding:0 18px; border:0; border-radius:3px; background:var(--naranja); color:#14262B; font-weight:600; cursor:pointer; }
+.acceso .err { color:var(--mal); font-size:13.5px; margin-top:10px; min-height:1.3em; }
 
-  /* Matriz */
-  .resumen { display: flex; flex-wrap: wrap; gap: 6px 26px; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
-  .resumen b { font-size: 1.4rem; font-weight: 600; }
-  .resumen span { color: var(--tinta2); font-size: .86rem; margin-left: 4px; }
-  .resumen .mal b { color: var(--rojo); }
-  .leyenda { display: flex; flex-wrap: wrap; gap: 14px; font-size: .78rem; color: var(--tinta2); margin-bottom: 8px; }
-  .leyenda i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; border: 1px solid; vertical-align: -1px; margin-right: 5px; }
-  .ruta { margin-bottom: 12px; }
-  .ruta .cabr { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 3px; font-size: .9rem; }
-  .ruta .cabr b { font-weight: 600; }
-  .ruta .cabr span { color: var(--tinta2); font-size: .78rem; }
-  .celdas { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 3px; }
-  .celda { flex: 0 0 126px; border: 1px solid; border-radius: 3px; padding: 5px 8px; cursor: pointer; background: var(--blanco); transition: background .4s, border-color .4s; }
-  .celda .p { font-size: .68rem; color: var(--tinta2); display: flex; justify-content: space-between; }
-  .celda .t { font-size: .78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .celda .h { font-size: .84rem; font-variant-numeric: tabular-nums; }
-  .celda.ok { background: #D9F1E6; border-color: var(--verde); }
-  .celda.mal { background: #F8DDD9; border-color: var(--rojo); }
-  .celda.pen { background: transparent; border-color: var(--regla); color: var(--tinta2); }
-  .detalle { margin-top: 8px; font-size: .86rem; color: var(--tinta2); min-height: 1.3em; }
-  .dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 8px 40px; }
-  .lista { max-height: 16rem; overflow: auto; }
-  .reg { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--regla); font-size: .9rem; }
-  .reg:last-child { border-bottom: 0; }
-  .reg small { display: block; color: var(--tinta2); font-size: .78rem; }
-  .reg .d { white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .km { display: grid; grid-template-columns: 7rem 1fr 4.4rem; align-items: center; gap: 8px; font-size: .86rem; padding: 3px 0; }
-  .km .bar { height: 10px; background: #F0C9B0; }
-  .km .bar i { display: block; height: 100%; background: var(--naranja); }
-  .km .v { text-align: right; font-variant-numeric: tabular-nums; }
-  .km.tot { border-top: 1px solid var(--regla); margin-top: 4px; padding-top: 7px; font-weight: 600; }
-  textarea { width: 100%; height: 170px; font-family: Consolas, monospace; font-size: .74rem; border: 1px solid var(--regla); padding: 8px; background: var(--blanco); color: var(--tinta); }
-  .pie { height: 40px; }
-  .barra-fechas { background: var(--blanco); border-bottom: 1px solid var(--regla); }
-  .bf-in { max-width: 1180px; margin: 0 auto; padding: 10px 16px 2px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: .86rem; }
-  .bf-in .tit { color: var(--tinta2); margin-right: 4px; font-weight: 600; }
-  .bf-in input[type=date] { padding: 4px 7px; border: 1px solid var(--regla); border-radius: 6px; background: var(--blanco); color: var(--tinta); font-size: .86rem; }
-  .bf-pre { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 6px; }
-  .bf-pre button { background: transparent; color: var(--tinta); border: 1px solid var(--regla); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: .84rem; cursor: pointer; }
-  .bf-pre button:hover { border-color: var(--verde); }
-  .bf-nota { max-width: 1180px; margin: 0 auto; padding: 0 16px 8px; color: var(--tinta2); font-size: .76rem; }
-  .tabs { max-width: 1180px; margin: 0 auto; padding: 0 16px; display: flex; flex-wrap: wrap; gap: 4px; }
-  .tabs button { background: transparent; color: #BFE3D3; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px; font: inherit; font-size: .92rem; cursor: pointer; }
-  .tabs button:hover { color: #fff; }
-  .tabs button[aria-selected="true"] { color: #fff; font-weight: 600; border-bottom-color: var(--naranja); }
-  [hidden] { display: none !important; }
-  .oculto { display: none; }
+/* ---------- Filtros ---------- */
+.filtros { display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 26px; padding:16px 0 18px; border-top:1px solid var(--filete); }
+.campo { display:flex; flex-direction:column; gap:6px; min-width:0; position:relative; }
+.campo > .rot { font-size:12.5px; color:var(--tinta-2); }
+.msum { border:1px solid var(--borde-campo); border-radius:3px; background:var(--fondo); font-size:14px; font-weight:600; padding:0 10px; min-width:190px; height:36px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; text-align:left; }
+.msum::after { content:"\25BE"; color:var(--tinta-2); font-weight:400; }
+.msum[aria-expanded="true"] { border-color:var(--naranja); }
+.mpanel { position:absolute; z-index:30; top:calc(100% + 4px); left:0; min-width:290px; background:var(--fondo); border:1px solid var(--tinta); box-shadow:0 14px 30px var(--sombra); padding:8px; }
+.macc { display:flex; gap:6px; padding-bottom:8px; border-bottom:1px solid var(--filete); margin-bottom:6px; }
+.macc button { flex:1; border:1px solid var(--filete); background:var(--fondo); border-radius:2px; padding:5px 8px; font-size:12.5px; font-weight:600; cursor:pointer; }
+.macc button:hover { border-color:var(--tinta); }
+.mlista { max-height:270px; overflow-y:auto; }
+.mlista label { display:flex; align-items:center; gap:8px; padding:6px; font-size:14px; cursor:pointer; }
+.mlista label:hover { background:var(--hover); }
+.mlista input { accent-color:var(--tinta); width:15px; height:15px; margin:0; }
+.mlista .ct { margin-left:auto; color:var(--tinta-2); font-size:12.5px; }
+.campo input[type=time] { height:36px; border:1px solid var(--borde-campo); border-radius:3px; padding:0 8px; font:inherit; font-size:14px; background:var(--fondo); color:var(--tinta); }
+
+/* ---------- Resumen ---------- */
+.hero-tit { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 16px; padding:22px 0 14px; border-top:1px solid var(--filete); }
+.hero-tit h2 { margin:0; font-size:17px; font-weight:600; }
+.hero-tit span { font-size:13.5px; color:var(--tinta-2); }
+.principales { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 44px; padding-bottom:26px; }
+.princ { display:flex; flex-direction:column; gap:11px; min-width:0; }
+.et { font-size:13.5px; color:var(--tinta-2); }
+.gran { font-size:36px; font-weight:400; line-height:1; letter-spacing:-.015em; font-variant-numeric:tabular-nums; }
+.gran em { font-family:var(--f-texto); font-style:normal; font-size:14px; color:var(--tinta-2); letter-spacing:0; margin-left:10px; }
+.bt { position:relative; height:20px; background:var(--filete-suave); }
+.bt .bf { position:absolute; left:0; top:0; bottom:0; background:var(--c-curso); transition:width .8s cubic-bezier(.2,.7,.2,1); }
+.bt .bf.sin { background:var(--c-sin); } .bt .bf.cer { background:var(--c-cerrada); }
+.bt::after { content:""; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(90deg, transparent 0 12px, var(--hueco) 12px 15px); }
+.bt-pie { display:flex; justify-content:space-between; gap:12px; font-size:13px; color:var(--tinta-2); }
+.bt-pie b { color:var(--tinta); font-weight:600; }
+.secundarios { display:grid; grid-template-columns:repeat(6, 1fr); border-top:1px solid var(--filete); }
+.sec-k { padding:16px 16px 12px 0; display:flex; flex-direction:column; gap:3px; min-width:0; }
+.sec-k + .sec-k { padding-left:16px; border-left:1px solid var(--filete); }
+.sec-k .num { font-size:24px; font-weight:400; line-height:1.1; font-variant-numeric:tabular-nums; }
+.sec-k .nt { font-size:12.5px; color:var(--tinta-2); }
+
+/* ---------- Hoja de operación ---------- */
+.cuerpo { padding:0 40px 20px; display:flex; flex-direction:column; }
+.seccion { display:grid; grid-template-columns:200px minmax(0,1fr); gap:14px 44px; padding:34px 0; border-bottom:1px solid var(--filete); }
+.seccion:last-child { border-bottom:none; }
+.seccion > .sh { align-self:start; position:sticky; top:14px; display:flex; flex-direction:column; gap:6px; }
+.sh h2 { margin:0; font-size:21px; font-weight:600; line-height:1.15; text-wrap:balance; }
+.sh h2::before { content:""; display:block; width:30px; height:4px; background:var(--naranja); margin-bottom:12px; }
+.sh span { font-size:13px; color:var(--tinta-2); }
+.vacio { font-size:13.5px; color:var(--tinta-2); padding:6px 0; }
+.listo { font-size:14px; font-weight:600; color:var(--ok); padding:6px 0; }
+.nota { font-size:12.5px; color:var(--tinta-2); }
+
+/* Rejillas */
+.tw { overflow-x:auto; }
+.rej { min-width:760px; }
+.rej-f { display:grid; gap:0 16px; align-items:center; padding:11px 0; border-bottom:1px solid var(--filete-suave); }
+.rej-f.cab { padding:0 0 8px; border-bottom:1px solid var(--tinta); font-size:12.5px; color:var(--tinta-2); }
+.rej-f .n { text-align:right; font-variant-numeric:tabular-nums; }
+.rej-f .nom b { font-family:var(--f-display); font-weight:600; font-size:16px; }
+.rej-f .nom small { display:block; font-size:12.5px; color:var(--tinta-2); margin-top:1px; }
+.g-llamar { grid-template-columns:minmax(150px,1.3fr) minmax(130px,1fr) 100px 120px; }
+.g-cli { grid-template-columns:minmax(130px,1.1fr) minmax(230px,2.2fr) 82px 126px 90px 80px 96px; }
+.bandas { display:flex; width:100%; gap:2px; height:26px; background:var(--filete-suave); }
+.bandas .seg { min-width:0; display:flex; align-items:center; justify-content:center; font-family:var(--f-display); font-weight:600; font-size:12.5px; color:#fff; }
+.bandas .seg.cer { background:var(--c-cerrada); }
+.bandas .seg.cur { background:var(--c-curso); }
+.bandas .seg.sin { background:repeating-linear-gradient(135deg, var(--c-sin) 0 5px, transparent 5px 9px); box-shadow:inset 0 0 0 2px var(--c-sin); color:var(--tinta); }
+.ley { display:flex; flex-wrap:wrap; gap:4px 18px; font-size:12.5px; color:var(--tinta-2); margin:0 0 14px; }
+.ley span { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+.ley i { width:11px; height:11px; display:inline-block; }
+.ley i.cer { background:var(--c-cerrada); } .ley i.cur { background:var(--c-curso); }
+.ley i.sin { background:repeating-linear-gradient(135deg, var(--c-sin) 0 3px, transparent 3px 5px); box-shadow:inset 0 0 0 1.5px var(--c-sin); }
+.ley i.lin { height:3px; width:18px; }
+.abrir { background:none; border:0; color:var(--acero); font-weight:600; font-size:13px; cursor:pointer; padding:4px 0; text-align:right; }
+:root[data-theme="dark"] .abrir { color:var(--c-cerrada); }
+.abrir:hover { text-decoration:underline; }
+.det { padding:6px 0 18px 18px; border-bottom:1px solid var(--filete-suave); display:grid; grid-template-columns:1fr 1fr; gap:10px 36px; }
+.det h3 { margin:6px 0 6px; font-size:14px; font-weight:600; }
+.pil { display:flex; justify-content:space-between; gap:12px; padding:8px 0 8px 10px; border-bottom:1px solid var(--filete-suave); border-left:4px solid var(--c-curso); cursor:pointer; }
+.pil:hover { background:var(--hover); }
+.pil.sin { border-left-color:var(--c-sin); }
+.pil b { font-family:var(--f-display); font-weight:600; font-size:15px; display:block; }
+.pil small { color:var(--tinta-2); font-size:12.5px; }
+.pil .d { text-align:right; font-size:12.5px; color:var(--tinta-2); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.tiendas { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:4px; padding:6px 0 10px 14px; }
+.tn { display:flex; justify-content:space-between; gap:8px; border-left:4px solid var(--filete); background:var(--panel); padding:4px 8px; font-size:12.5px; }
+.tn.ok { border-left-color:var(--c-curso); } .tn.mal { border-left-color:var(--mal); }
+.tn span:last-child { font-variant-numeric:tabular-nums; text-align:right; }
+
+/* Gráfica por hora */
+.grafica { width:100%; height:auto; display:block; }
+.grafica text { font-family:var(--f-texto); font-size:11px; fill:var(--tinta-2); }
+.grafica .eje { stroke:var(--filete); stroke-width:1; }
+.grafica .l1 { fill:none; stroke:var(--naranja); stroke-width:2.6; stroke-linejoin:round; stroke-linecap:round; }
+.grafica .l2 { fill:none; stroke:var(--c-cerrada); stroke-width:1.6; stroke-linejoin:round; opacity:.85; }
+.grafica .l3 { fill:none; stroke:var(--punto); stroke-width:1.4; stroke-linejoin:round; stroke-dasharray:4 3; }
+
+/* Alertas y kilómetros */
+.dos { display:grid; grid-template-columns:1fr 1fr; }
+.dos > div { min-width:0; display:flex; flex-direction:column; gap:8px; }
+.dos > div:first-child { padding-right:28px; }
+.dos > div + div { padding-left:28px; border-left:1px solid var(--filete); }
+.tit-g { font-family:var(--f-display); font-size:17px; font-weight:600; }
+.fila-r { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:9px 0; border-bottom:1px solid var(--filete-suave); font-size:14px; }
+.fila-r > div:first-child { flex:1.4 1 0; min-width:0; } .fila-r > div:nth-child(2) { flex:1 1 0; min-width:0; }
+.fila-r b { font-weight:600; } .fila-r small { color:var(--tinta-2); font-size:12.5px; display:block; }
+.fila-r .h { font-variant-numeric:tabular-nums; color:var(--tinta-2); text-align:right; white-space:nowrap; }
+.fila-km { display:grid; grid-template-columns:minmax(110px,1fr) minmax(80px,1.6fr) 74px; align-items:center; gap:14px; padding:8px 0; border-bottom:1px solid var(--filete-suave); font-size:14px; }
+.fila-km span { font-family:var(--f-display); font-weight:600; font-size:15px; }
+.fila-km .mini { height:10px; background:var(--filete-suave); } .fila-km .mini i { display:block; height:100%; background:var(--c-cerrada); }
+.fila-km b { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+.pie { padding:14px 40px; border-top:1px solid var(--filete); font-size:12.5px; color:var(--tinta-2); display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 24px; }
+.diag summary { cursor:pointer; }
+.diag textarea { width:100%; height:150px; margin-top:8px; font-family:Consolas, monospace; font-size:12px; border:1px solid var(--borde-campo); padding:8px; background:var(--fondo); color:var(--tinta); }
+
+@media (max-width:1000px) {
+    .principales { grid-template-columns:1fr; gap:30px; }
+    .secundarios { grid-template-columns:1fr 1fr 1fr; }
+    .sec-k, .sec-k + .sec-k { padding:14px 12px 4px 0; border-left:none; }
+    .seccion { grid-template-columns:minmax(0,1fr); gap:16px; padding:26px 0; }
+    .seccion > .sh { position:static; }
+    .dos { grid-template-columns:1fr; gap:24px; }
+    .dos > div:first-child { padding-right:0; } .dos > div + div { padding-left:0; border-left:none; padding-top:20px; border-top:1px solid var(--filete); }
+    .det { grid-template-columns:1fr; }
+    .rej { min-width:0; }
+    .g-llamar { grid-template-columns:1fr 1fr; } .g-llamar.cab { display:none; }
+    .g-llamar > :nth-child(1) { grid-column:1 / -1; }
+    .g-cli { grid-template-columns:1fr 1fr 1fr; gap:6px 10px; } .g-cli.cab { display:none; }
+    .g-cli > :nth-child(1) { grid-column:1 / 3; } .g-cli > :nth-child(2) { grid-column:1 / -1; grid-row:2; }
+    .g-cli > :nth-child(7) { grid-column:3; grid-row:1; }
+    .g-cli > :nth-child(3), .g-cli > :nth-child(4), .g-cli > :nth-child(5) { grid-row:3; text-align:left; }
+    .g-cli > :nth-child(6) { display:none; }
+}
+@media (max-width:700px) {
+    body { padding:0 0 32px; }
+    .noche-in, .cuerpo, .pie { padding-left:16px; padding-right:16px; }
+    .gran { font-size:32px; } .secundarios { grid-template-columns:1fr 1fr; } .cab-izq h1 { font-size:23px; }
+}
+@media (prefers-reduced-motion:reduce) { .bt .bf { transition:none; } }
 </style>
 </head>
 <body>
-<header class="cab">
-  <div class="cab-in">
-    <div>
-      <h1>Tableros</h1>
-      <p id="sub">Conecta para ver las rutas del día.</p>
+<div class="pagina">
+<header class="noche">
+  <div class="membrete"><i></i><i></i></div>
+  <div class="noche-in">
+    <div class="cabecera">
+      <div class="cab-izq">
+        <div class="logo-placa"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAAByCAYAAAC2ujQmAAABJGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGAycHRxcmUSYGDIzSspCnJ3UoiIjFJgP8/AxsDMAAaJycUFjgEBPiB2Xn5eKgMG+HaNgRFEX9YFmYUpjxdwJRcUlQDpP0BslJJanMzAwGgAZGeXlxQAxRnnANkiSdlg9gYQuygkyBnIPgJk86VD2FdA7CQI+wmIXQT0BJD9BaQ+Hcxm4gCbA2HLgNglqRUgexmc8wsqizLTM0oUDC0tLRUcU/KTUhWCK4tLUnOLFTzzkvOLCvKLEktSU4BqIe4DA0GIQlCIaQA1WmiS6G+CABQPENbnQHD4MoqdQYghQHJpURmUychkTJiPMGOOBAOD/1IGBpY/CDGTXgaGBToMDPxTEWJqhgwMAvoMDPvmAADAxk/9GlU2EAAABapJREFUeJztnTF220YQhj/kiSUfdQPxBlYdFqJPEN5A1HuoaeYG8AkCsQ0L+gbUDaACtakbUDegopIFUmCp8MWyIoWYmd0FvsZ+KvYf6/did3YHg6SqKjrC4RfrADo+xpm0QLIcDYEhcHn0Z8fH2VRpORc3rErLLbAFisPPkuVoDIyBCfBJOoaYSKzXMDcDJ8AcuLCMxXPuq7Qcmxt2TLIcTYGMzrjXuK/ScuzVpqNKy1WVlkPgBng0DsdLvDLsQJWWK+rNya1tJP7hpWEAVVruqrScA5+BJ+NwvMFbww5UaVlQpwMPtpH4gfeGQT3bqNOAO9tI7AnCMHh5RE6Ab9axWBKMYQeqtJwC99ZxWBGcYY4JLV3TgjTMrWkTWrh7DNIweDmjnBqHoU6whgFUabmmZTvHoA1zzGnRozF4w9yjMTcOQ43gDXPktGSWRWGY2zXmxmGoEIVhjtw6AA2iMczNsuiPrc6eF71Tr5yfgA2wc38W/dm+OHHM/8sauDbSViH56/ZMokbgifqXl/dn+43A+D8lWY52wEBTUwnREoEB9f/078+L3vp50TsX0nmNQlFLHY017Ddg+7zoXSpoQWdYIwyA4nnRGypoFQoaZmjuEgfASlqkSsuNtIYl2tv6q+dFb6qgE+1dmUUeNlXQ2CpomGBh2JXCrnEjPL4ZVicdl0a6wWNl2Fh4/I3w+GZEc5b4L3bWAUjRPRIDw8qwcyPd4In1kRgtsRp2bh2AFFaGFcLjXwqPb0asMyxauhkWGFaGbYTHHwqPb4aFYXf92X4nrBFt7w8Lw1aSg7umLdGibdhDf7ZfC2tcCo9virZhUwWNsYKGGZqG3UiXvCXL0Tl10U+0aBl205/tVwo6EwUNU6S7uT0CU8VK4ImSjhlShj1QV/2uhMb/AdcVLurHIdSGNdVCYcM/tfXbhsb8CHMDTXXO+rP92DqIU3GbjalxGCrEcvibEecLED8QvGFu7fpiHYcWwRuGQvm3TwRtWLIczYEr6zg0CdawZDm6pF67WkWQhrld4YqWbDSOCdIw6tdxo73zeovgDEuWoxUtW7eOCcowZ1bUXQL+C/FPeTSBW7PWtHhmHfB+hrndYEFnFuC5YS7P+k5LNxiv4eUj0RXS5HRG/YB3hh2tV63Lsd6Dd49E1+RrahyGt3hnGLz08m1tb/q38NIwx9Q6AB/x1jDXyzf6/ocfxVvDHHNa0sv3vXhtWJt6+b6Xs2Q5OqXB5Wf3fS9Jcur1rPsuJqfPsKyJIN7CzTJxnVA41bAr92VYUdw3MbuPmNLMGpY1MMZ7mCrpeE0Thl0ozbKCLplubJeYuTNAaeYKGl7TlGEXKPwyXXvYVifTTeZhc6VZliloeEuThg3QmWVb4Ku0jq80fdKhNctyWnpk1bRhAxSOktqcTEucJV67N0pEqdIyp4XJtNThbyY0rpWON0gZdu3K00RxR1atSqYlr1dywbGPyZR0vEDSsCuNvk/uyKo133KWvsDMhMc/MFfSMUfasKtkOZoIaxyS6VtpHR/QKBHIFTSgns3RJ9Mahmldv+xoQf2HVhFOpqSTE3kyrWXYhXsTRZQ2HFlplrmpXHK6ZLr7Ql8DqFy/OLR01NEuJFW5fom5/kPbsAFdMn0SFqXaX5SuXzZEWP9hVVufKerEkkxvwM4wrUvOLfEk0xuwfXtlpaSTE8csW4OtYVrXLzvC34B8c/8O8/fDcsVkOuQjq+zwF2vDPqG3xsyVdJrmq1uLAXvDoN6ArKRFAu1McF+lZXb8Ax8MAyXTCOtg+IFXvnThi2FQm1ZIrmnuyCqEZPoOGB82Gsf4ZBjUHdu2wlcxmeDYp/IE/F6l5eQ1s8A/w6A+b/wjWY62EjfVntZ/PFK/4DF0Fc0/JeHPXwuNiE5gB+RNdis4akBmyQbYAoU793wXSVWd0vWhQxsfH4kdb/A3HcCNQ9p7nV4AAAAASUVORK5CYII=" alt="Ransa"></div>
+        <div><h1>Tableros</h1><div class="sub" id="subtitulo">Entregas del día</div></div>
+      </div>
+      <div class="cab-der">
+        <span id="marcaTiempo"></span>
+        <button type="button" class="btn-s" id="btnAct">Actualizar</button>
+        <button type="button" class="btn-s" id="btnTema">Modo oscuro</button>
+        <span id="estado" class="estado">Conectando…</span>
+      </div>
     </div>
-    <div class="vivo"><span class="punto" id="punto"></span><span id="vivoTxt">Sin conexión</span><span id="ult" style="color:#BFE3D3"></span></div>
-    <div class="ctl"><button class="btn claro" id="btnAct" type="button">Recargar</button></div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Tableros"></nav>
   </div>
-  <nav class="tabs" id="tabs" aria-label="Tableros" role="tablist"></nav>
-  <div class="regla"></div>
 </header>
 
-<details class="aj" id="aj" open>
-  <summary>Conexión y ajustes</summary>
-  <div class="fila">
-    <div><label for="urlDatos">Dirección de los datos</label><input type="text" id="urlDatos" placeholder="Déjalo vacío: se busca solo (repositorio Tableros)"></div>
-    <div><label for="sbKey">Clave de acceso</label><input type="password" id="sbKey" placeholder="La que te dieron" autocomplete="current-password"></div>
-    <div><label for="refresco">Actualizar cada</label><select id="refresco"><option value="120">2 minutos</option><option value="180">3 minutos</option><option value="300" selected>5 minutos</option><option value="600">10 minutos</option></select></div>
-  </div>
-  <button class="btn" id="btnConectar" type="button">Conectar</button>
-  <p class="vacio">Para compartir el tablero, pasa este archivo y la clave. Adentro no hay ningún token: los datos llegan cifrados y solo se abren con la clave.</p>
-</details>
+<div id="aviso" class="aviso" hidden style="margin:12px 40px 0"></div>
 
-<div id="aviso"></div>
-
-<div data-tablero="entregas">
-<div class="barra-fechas" id="barraFechas">
-  <div class="bf-in">
-    <span class="tit">Fecha de las visitas</span>
-    <label for="desde">desde</label><input type="date" id="desde">
-    <label for="hasta">hasta</label><input type="date" id="hasta" title="Opcional. Para ver varios días a la vez">
-    <span class="bf-pre"><button type="button" data-rango="0">Hoy</button><button type="button" data-rango="-1">Ayer</button><button type="button" data-rango="3">Últimos 3 días</button></span>
+<section id="acceso" class="acceso" hidden>
+  <h2>Entra con la clave del equipo</h2>
+  <p>La clave abre los datos del tablero. Si no la tienes, pídesela a quien te compartió este archivo.</p>
+  <div class="fila-a">
+    <input type="password" id="clave" placeholder="Clave" autocomplete="current-password" aria-label="Clave del equipo">
+    <button type="button" class="ir" id="btnEntrar">Entrar</button>
   </div>
-  <p class="bf-nota">Se publican los últimos 3 días. Los datos se renuevan solos cada pocos minutos.</p>
+  <div class="err" id="errAcceso" role="alert"></div>
+</section>
+
+<div id="vista" data-tablero="entregas" hidden>
+  <div style="padding:0 40px">
+    <div class="filtros" id="filtros"></div>
+  </div>
+
+  <div style="padding:0 40px">
+    <div class="hero-tit"><h2>Resumen del día</h2><span id="textoSeleccion"></span></div>
+    <div class="principales" id="principales"></div>
+    <div class="secundarios" id="secundarios"></div>
+  </div>
+
+  <main class="cuerpo">
+    <section class="seccion">
+      <div class="sh"><h2>Pilotos por llamar</h2><span id="notaLlamar"></span></div>
+      <div id="llamar"></div>
+    </section>
+    <section class="seccion">
+      <div class="sh"><h2>Rutas por cliente</h2><span>Abre un cliente para ver sus pilotos, primero los que no han salido</span></div>
+      <div id="clientes"></div>
+    </section>
+    <section class="seccion">
+      <div class="sh"><h2>Entregas por hora</h2><span>Tiendas marcadas como entregadas</span></div>
+      <div id="horas"></div>
+    </section>
+    <section class="seccion">
+      <div class="sh"><h2>Para revisar</h2><span>Lo que se salió del plan</span></div>
+      <div class="dos"><div id="noEnt"></div><div id="sinPiloto"></div></div>
+    </section>
+    <section class="seccion">
+      <div class="sh"><h2>Distancia real recorrida</h2><span>La llena SimpliRoute al cerrar cada ruta</span></div>
+      <div id="km"></div>
+    </section>
+  </main>
 </div>
 
-
-<div id="tablero" class="oculto">
-  <section class="resumen-top" id="resumenTop"></section>
-
-  <section class="sec">
-    <div class="filtros">
-      <div class="grp" id="combos"></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <h2>Rutas por cliente <span class="nota" id="notaClientes"></span></h2>
-    <div id="clientes"></div>
-  </section>
-
-  <section class="sec llamar">
-    <h2>Pilotos que no han iniciado ruta <span class="nota" id="notaLlamar"></span></h2>
-    <div id="llamar"></div>
-  </section>
-
-  <section class="sec">
-    <h2>Otras alertas</h2>
-    <div id="alertas"></div>
-  </section>
-
-
-  <section class="sec">
-    <div class="dos">
-      <div><h2>Distancia real recorrida</h2><div id="km"></div></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <details>
-      <summary>Diagnóstico de datos</summary>
-      <p class="vacio">Sirve para confirmar cómo marca SimpliRoute las rutas. Copia el texto y pégalo en el chat.</p>
-      <textarea id="diag" readonly></textarea>
-      <button class="btn sec" id="btnCopiar" type="button" style="margin-top:6px;">Copiar diagnóstico</button>
-    </details>
-  </section>
-  <div class="pie"></div>
-</div>
+<footer class="pie">
+  <span id="pieDatos"></span>
+  <details class="diag"><summary>Diagnóstico de datos</summary><textarea id="diag" readonly></textarea></details>
+</footer>
 </div>
 
 <script>
-// Lee SimpliRoute directo con el token (solo consultas GET) y le entrega los datos a la página con la misma forma de siempre.
 (function () {
-  let CLAVE = "", cat = { ts: 0, pil: {}, veh: {} }, enVuelo = null, ultimo = { ts: 0, d: null };
-  let planCache = {};
-  window.__setClave = (c) => { CLAVE = c; ultimo = { ts: 0, d: null }; cat = { ts: 0, pil: {}, veh: {} }; planCache = {}; };
-  const val = (id) => document.getElementById(id).value;
-  const txt = (x) => (x === null || x === undefined || x === "" ? null : String(x));
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s === null || s === undefined ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const norm = (s) => String(s || "").toLowerCase().trim();
   const num = (x) => (x === null || x === undefined || x === "" || isNaN(Number(x)) ? null : Number(x));
-  function fechas() {
-    const d = val("desde"), h = val("hasta") && val("hasta") > d ? val("hasta") : d, out = [];
-    for (let a = new Date(d + "T00:00:00"); a <= new Date(h + "T00:00:00"); a.setDate(a.getDate() + 1)) out.push(a.toISOString().slice(0, 10));
-    return out;
+  const fmt = (n) => Number(n).toLocaleString("es-GT");
+  const fmt1 = (n) => Number(n).toLocaleString("es-GT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const hoyGT = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Guatemala" });
+  function ahoraMin() { const p = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Guatemala" }).split(":"); return Number(p[0]) * 60 + Number(p[1]); }
+  const toMin = (h) => { if (!h) return NaN; const p = String(h).split(":"); return Number(p[0]) * 60 + Number(p[1]); };
+  // Guatemala no cambia de horario: siempre UTC-6
+  function horaGT(s) {
+    if (!s) return "";
+    s = String(s);
+    if (/^\d{1,2}:\d{2}/.test(s)) return s.slice(0, 5);
+    if (/(Z|[+-]\d{2}:?\d{2})$/.test(s)) { const t = Date.parse(s); if (!isNaN(t)) { const d = new Date(t - 6 * 3600000); return String(d.getUTCHours()).padStart(2, "0") + ":" + String(d.getUTCMinutes()).padStart(2, "0"); } }
+    const m = s.match(/[T ](\d{2}:\d{2})/); return m ? m[1] : "";
   }
-  window.__srDiag = [];
-  const nota = (path, estado, cuenta) => window.__srDiag.push(path + " → " + estado + (cuenta !== undefined ? ", " + cuenta + " registros" : ""));
-  function destino(path) {
-    let m;
-    if ((m = path.match(/^routes\/visits\/\?planned_date=([\d-]{10})$/))) return "visitas?fecha=" + m[1];
-    if ((m = path.match(/^routes\/routes\/\?planned_date=([\d-]{10})$/))) return "rutas?fecha=" + m[1];
-    if ((m = path.match(/^routes\/plans\/\?planned_date=([\d-]{10})$/))) return "planes?fecha=" + m[1];
-    if ((m = path.match(/^routes\/plans\/([0-9a-fA-F-]{8,40})\/$/))) return "plan?id=" + m[1];
-    if (path === "accounts/drivers/") return "conductores";
-    if (path === "routes/vehicles/") return "vehiculos";
-    return null;
-  }
-  let DATOS = null;
-  const ITER = 250000; // igual al de generar.py
-  // Dirección del archivo cifrado: se prueba con los nombres de repositorio más probables. Si usas otro, escríbela en "Conexión y ajustes".
+  const nombreDia = (f) => { const d = new Date(f + "T12:00:00"); return d.toLocaleDateString("es-GT", { weekday: "short", day: "numeric", month: "short" }); };
+
+  /* ---------- Configuración ---------- */
+  // Para sumar otro tablero: se agrega aquí y se crea su <div data-tablero="id">.
+  const TABLEROS = [{ id: "entregas", nombre: "Entregas" }];
+  const GRUPOS = [["pizza_hut", "Premium"], ["kfc", "Premium"], ["starbucks", "Premium"]];
   const REPOS = ["tableros", "tablero", "Tableros", "Tablero", "tablero-entregas"];
   const urlDe = (r) => "https://raw.githubusercontent.com/aarriazag/" + r + "/datos/datos.bin";
+  const ITER = 250000; // igual al de generar.py
+  const REFRESCO_MS = 180000;
+
+  const S = { clave: "", datos: null, M: null, tablero: "entregas", menu: null, cargando: false, tCarga: 0, horaAlerta: "07:00", abiertos: new Set(), abiertosP: new Set(),
+              F: { fe: { todos: false, sel: new Set(), lista: [] }, cli: { todos: true, sel: new Set(), lista: [] }, usr: { todos: true, sel: new Set(), lista: [] } }, timer: null, diagAviso: "" };
+  const okF = (f, v) => f.todos || f.sel.has(v);
+
+  /* ---------- Tema y preferencias ---------- */
+  function aplicarTema(t) { if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); }
+  function temaActual() { const t = document.documentElement.getAttribute("data-theme"); if (t) return t; return (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light"; }
+  function pintarBotonTema() { $("btnTema").textContent = temaActual() === "dark" ? "Modo claro" : "Modo oscuro"; }
+  function guardarPrefs() {
+    try { localStorage.setItem("tab_prefs", JSON.stringify({ cli: { todos: S.F.cli.todos, sel: [...S.F.cli.sel] }, usr: { todos: S.F.usr.todos, sel: [...S.F.usr.sel] }, hora: S.horaAlerta, ab: [...S.abiertos], abp: [...S.abiertosP] })); } catch (e) {}
+  }
+  function cargarPrefs() {
+    try {
+      const g = JSON.parse(localStorage.getItem("tab_prefs") || "null"); if (!g) return;
+      ["cli", "usr"].forEach((k) => { if (g[k]) { S.F[k].todos = g[k].todos !== false; S.F[k].sel = new Set(g[k].sel || []); } });
+      if (g.hora) S.horaAlerta = g.hora;
+      S.abiertos = new Set(g.ab || []); S.abiertosP = new Set(g.abp || []);
+    } catch (e) {}
+  }
+
+  /* ---------- Datos: bajar, abrir con la clave ---------- */
   async function descifrar(buf, clave) {
     const b = new Uint8Array(buf), sal = b.slice(0, 16), iv = b.slice(16, 28), cif = b.slice(28);
     const mat = await crypto.subtle.importKey("raw", new TextEncoder().encode(clave), "PBKDF2", false, ["deriveKey"]);
     const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: sal, iterations: ITER, hash: "SHA-256" }, mat, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
     let plano;
-    try { plano = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, cif); } catch (e) { throw new Error("La clave de acceso no es correcta."); }
+    try { plano = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, cif); } catch (e) { const er = new Error("La clave no es correcta."); er.clave = true; throw er; }
     return JSON.parse(await new Response(new Blob([plano]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
   }
-  async function bajarDatos() {
-    if (!CLAVE) throw new Error("Escribe la clave de acceso.");
-    if (window.__onProgreso) window.__onProgreso("Bajando los datos más recientes…");
-    let r;
-    const manual = (document.getElementById("urlDatos").value || "").trim();
-    let buena = ""; try { buena = localStorage.getItem("ce_url_ok") || ""; } catch (e) {}
-    const candidatos = [...new Set(manual ? [manual] : [buena].concat(REPOS.map(urlDe)).filter(Boolean))];
-    let usada = "";
-    for (const c of candidatos) {
-      try { r = await fetch(c + (c.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now(), { cache: "no-store" }); } catch (e) { throw new Error("No se pudo bajar el archivo de datos. Revisa tu internet."); }
+  async function bajar() {
+    let manual = ""; try { manual = (location.hash.match(/datos=([^&]+)/) || [])[1] || ""; manual = manual ? decodeURIComponent(manual) : ""; } catch (e) {}
+    let buena = ""; try { buena = localStorage.getItem("tab_url_ok") || ""; } catch (e) {}
+    const cand = [...new Set((manual ? [manual] : [buena].concat(REPOS.map(urlDe))).filter(Boolean))];
+    let r = null, usada = "";
+    for (const c of cand) {
+      try { r = await fetch(c + (c.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now(), { cache: "no-store" }); } catch (e) { throw new Error("No hay conexión con el servidor de datos. Revisa tu internet."); }
       if (r.ok) { usada = c; break; }
     }
-    if (!usada) throw new Error(r && r.status === 404 ? "No encuentro el archivo de datos. Revisa que el repositorio sea público, que se llame Tableros (o escribe su dirección en Conexión y ajustes) y que el flujo de GitHub ya haya corrido una vez." : "No se pudo bajar el archivo de datos (HTTP " + (r ? r.status : "?") + ").");
-    try { localStorage.setItem("ce_url_ok", usada); } catch (e) {}
-    DATOS = await descifrar(await r.arrayBuffer(), CLAVE);
-    nota("datos publicados", "fechas " + DATOS.fechas.join(", ") + ", generados " + DATOS.generado);
+    if (!usada) throw new Error(r && r.status === 404 ? "No encuentro los datos publicados. El repositorio debe ser público, llamarse Tableros y tener corrido el flujo de GitHub al menos una vez." : "No se pudieron bajar los datos (HTTP " + (r ? r.status : "?") + ").");
+    try { localStorage.setItem("tab_url_ok", usada); } catch (e) {}
+    return r.arrayBuffer();
   }
-  async function leer(path) {
-    const d = destino(path);
-    if (!d || !DATOS) throw new Error("Consulta no permitida.");
-    const [recurso, q] = d.split("?"), arg = q ? q.split("=")[1] : "";
-    let out;
-    if (recurso === "visitas") out = DATOS.visitas.filter((v) => v.planned_date === arg);
-    else if (recurso === "rutas") out = DATOS.rutas.filter((r) => r.planned_date === arg);
-    else if (recurso === "planes") out = (DATOS.planes || []).filter((p) => !p.planned_date || p.planned_date === arg);
-    else if (recurso === "plan") out = (DATOS.planes || []).find((p) => p.id === arg) || null;
-    else if (recurso === "conductores") out = DATOS.conductores || [];
-    else out = DATOS.vehiculos || [];
-    nota(path, "datos publicados", Array.isArray(out) ? out.length : undefined);
-    return out;
-  }
-  async function cargarSR() {
-    window.__srDiag = [];
-    await bajarDatos();
-    const F = fechas();
-    if (F.length > 7) throw new Error("Máximo 7 días por consulta.");
-    let vis = [], det = {};
-    for (const f of F) vis = vis.concat(await leer("routes/visits/?planned_date=" + f));
-    try { for (const f of F) (await leer("routes/routes/?planned_date=" + f)).forEach((r) => { if (r && r.id) det[r.id] = r; }); } catch (e) { det = {}; }
-    window.__srSinVisitas = false;
-    if (!vis.length && Object.keys(det).length) {
-      // SimpliRoute devolvió rutas pero no visitas: se prueban otras formas de leerlas y se muestran al menos las rutas
-      const d0 = F[0], dia = (n) => { const x = new Date(d0 + "T00:00:00"); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
-      for (const dd of [dia(-1), dia(1)]) { try { await leer("routes/visits/?planned_date=" + dd); } catch (e) {} }
-      const rs = Object.values(det), r0 = rs[0];
-      try { await leer("routes/visits/?route=" + r0.id); } catch (e) {}
-      window.__srDiag.push("rutas: " + rs.length + ", con start_time: " + rs.filter((r) => r.start_time).length + ", con end_time: " + rs.filter((r) => r.end_time).length + ", con piloto: " + rs.filter((r) => r.driver).length + ", total_visits de la primera: " + r0.total_visits + ", campos: " + Object.keys(r0).join(","));
-      try {
-        const n1 = window.__srDiag.length; let pl = [];
-        for (const dd of F) pl = pl.concat(await leer("routes/plans/?planned_date=" + dd));
-        window.__srDiag.length = n1;
-        pl.forEach((x) => { if (x && x.id) planCache[x.id] = x; });
-        window.__srDiag.push("planes del día: " + pl.length + (pl[0] ? ", campos: " + Object.keys(pl[0]).join(",") + ", nombres de ejemplo: " + pl.slice(0, 5).map((x) => x.name || x.title || "").join(" / ") : ""));
-      } catch (e) { window.__srDiag.push("planes del día: sin acceso"); }
-      const grupoPlan = (r) => { const x = planCache[r.plan], nm = x && (x.name || x.title); return nm ? String(nm).replace(/\s*\d{4}-\d{2}-\d{2}.*$/, "").replace(/[_]+/g, " ").trim() : null; };
-      // Sin visitas no se conoce el cliente: se agrupan por el nombre del plan y, si no hay, por el lugar de salida de la ruta (ej. GT-CD_VILLA_NUEVA_SECO)
-      const origen = (r) => { const s = String(r.location_start_address || "").replace(/^GT[-_ ]?/i, "").replace(/^CD[-_ ]?/i, "").replace(/[_-]+/g, " ").trim(); return s ? s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : "Sin origen"; };
-      const cuentaO = {}; rs.forEach((r) => { const o = origen(r); cuentaO[o] = (cuentaO[o] || 0) + 1; });
-      window.__srDiag.push("salidas de las rutas: " + JSON.stringify(cuentaO));
-      vis = rs.map((r) => ({ id: "ruta-" + r.id, route: r.id, planned_date: r.planned_date || d0, order: 1, title: "Visitas no disponibles", status: "pending", visit_type: null, cliente: grupoPlan(r) || origen(r), route_status: r.status, is_route_completed: !!r.end_time, driver: r.driver, vehicle: r.vehicle }));
-      window.__srSinVisitas = true;
-    }
-    if (Date.now() - cat.ts > 600000) {
-      try { const p = await leer("accounts/drivers/"); cat.pil = {}; p.forEach((d) => { cat.pil[String(d.id)] = d.name || ((d.first_name || "") + " " + (d.last_name || "")).trim(); }); } catch (e) {}
-      try { const v = await leer("routes/vehicles/"); cat.veh = {}; v.forEach((x) => { cat.veh[String(x.id)] = x.license_plate || x.name; }); } catch (e) {}
-      cat.ts = Date.now();
-    }
-    const visitas = [], porRuta = {};
-    vis.filter((v) => v && v.id).forEach((v) => {
-      const f = { id: v.id, route_id: txt(v.route), planned_date: txt(v.planned_date), orden: num(v.order), title: txt(v.title) || txt(v.address), reference: txt(v.reference),
-        status: txt(v.status), checkout_time: txt(v.checkout_time), checkin_time: txt(v.checkin_time), checkout_comment: txt(v.checkout_comment), checkout_observation: txt(v.checkout_observation),
-        visit_type: txt(v.visit_type), cliente: txt(v.cliente), route_status: txt(v.route_status), is_route_completed: v.is_route_completed === true, driver_id: num(v.driver), vehicle_id: num(v.vehicle) };
-      visitas.push(f);
-      if (f.route_id) { const a = (porRuta[f.route_id] = porRuta[f.route_id] || { fecha: f.planned_date, estado: null, driver: null, vehicle: null, n: 0 }); a.n++; a.estado = a.estado || f.route_status; a.driver = a.driver || f.driver_id; a.vehicle = a.vehicle || f.vehicle_id; }
-    });
-    const rutas = Object.keys(porRuta).map((rid) => {
-      const a = porRuta[rid], d = det[rid] || {}, driver = num(d.driver) || a.driver, vehicle = num(d.vehicle) || a.vehicle;
-      return { route_id: rid, planned_date: a.fecha, status: txt(d.status) || a.estado, start_time: txt(d.start_time), end_time: txt(d.end_time), kilometers: num(d.kilometers), reference: txt(d.reference),
-        driver_id: driver, piloto: driver ? txt(cat.pil[String(driver)]) : null, vehicle_id: vehicle, placa: vehicle ? txt(cat.veh[String(vehicle)]) : null, total_visits: a.n, id_viaje: null, viaje_estado: null, creado_por: det[rid] ? creador(txt(det[rid].plan)) : null, plan_id: det[rid] ? txt(det[rid].plan) : null };
-    });
-    return { sr_visitas_dia: visitas, sr_rutas_dia: rutas, sr_sync_estado: [{ id: 1, ultima_sync: DATOS.generado, mensaje: "Datos de SimpliRoute" }] };
-  }
-  const creador = (p) => { const x = planCache[p]; if (!x || typeof x !== "object") return null; for (const k of Object.keys(x)) if (/owner|creator|created_by|createdby|user|author/i.test(k)) { const v = x[k]; if (v && typeof v === "object") return txt(v.name || v.username || v.email || v.id); if (v !== null && v !== "") return String(v); } return null; };
-  window.__creadorPlan = (p) => (p ? creador(p) : null);
-  let cargandoPlanes = false;
-  // Quién generó el plan: se prueba con UN plan; solo si trae un campo de dueño o creador se leen los demás, ya con el tablero pintado
-  window.__cargarPlanes = async () => {
-    if (cargandoPlanes || !ultimo.d) return 0;
-    cargandoPlanes = true;
-    try {
-      const ids = [...new Set(ultimo.d.sr_rutas_dia.map((r) => r.plan_id).filter(Boolean))].filter((p) => !(p in planCache));
-      if (!ids.length) return 0;
-      const n0 = window.__srDiag.length;
-      const uno = async (p) => { try { planCache[p] = await leer("routes/plans/" + p + "/"); } catch (e) { planCache[p] = null; } };
-      await uno(ids[0]);
-      const ej = planCache[ids[0]];
-      window.__srDiag.length = n0;
-      window.__srDiag.push("plan de ejemplo: " + (ej && typeof ej === "object" ? "campos " + Object.keys(ej).join(",") : "sin acceso") + (creador(ids[0]) ? " | creador encontrado" : " | sin campo de creador"));
-      if (!creador(ids[0])) return 0;
-      const resto = ids.slice(1, 150);
-      for (let i = 0; i < resto.length; i += 4) await Promise.all(resto.slice(i, i + 4).map(uno));
-      window.__srDiag.length = n0 + 1;
-      return resto.length + 1;
-    } catch (e) { return 0; } finally { cargandoPlanes = false; }
-  };
-  function compartido() {
-    if (enVuelo) return enVuelo;
-    if (ultimo.d && Date.now() - ultimo.ts < 3000) return Promise.resolve(ultimo.d);
-    enVuelo = cargarSR().then((d) => { ultimo = { ts: Date.now(), d }; enVuelo = null; return d; }, (e) => { enVuelo = null; throw e; });
-    return enVuelo;
-  }
-  function builder(t) { const b = { select() { return b; }, gte() { return b; }, lte() { return b; }, order() { return b; }, range() { return b; }, eq() { return b; },
-    maybeSingle() { return compartido().then((d) => ({ data: d[t][0] })).catch((e) => ({ data: null, error: e })); },
-    then(res, rej) { return compartido().then((d) => ({ data: d[t] })).catch((e) => ({ data: null, error: { message: e.message } })).then(res, rej); } }; return b; }
-  window.supabase = { createClient: () => ({ from: builder, removeChannel() {}, channel: () => { const c = { on() { return c; }, subscribe(cb) { setTimeout(() => cb("SUBSCRIBED"), 30); return c; } }; return c; } }) };
-})();
-</script>
-<script>
-(function () {
-  
 
-  const $ = (id) => document.getElementById(id);
-  const NOMBRES = { unisuper: "UniSuper", kfc: "KFC", pizza_hut: "Pizza Hut", starbucks: "Starbucks", dollarcity: "Dollarcity", natura: "Natura", nestle: "Nestlé", kellogg: "Kellogg", pricesmart: "PriceSmart", dos_pinos: "Dos Pinos", chocolate_rico: "Chocolate Rico", grupo_brio: "Grupo Brío", especias_donjulio: "Especias Don Julio", herbalife: "Herbalife", quala: "Quala", dinant: "Dinant", petoy: "Petoy", calsa: "Calsa", diana: "Diana", bayer: "Bayer", hgw: "HGW" };
-  const CLAVES = Object.keys(NOMBRES).sort((a, b) => b.length - a.length);
-  // Clientes que se muestran juntos en una sola tarjeta
-  const GRUPOS = [["pizza_hut", "Premium"], ["kfc", "Premium"], ["starbucks", "Premium"]];
-
-  // Para sumar otro tablero: se agrega aquí y se crea su <div data-tablero="id"> con su contenido.
-  const TABLEROS = [{ id: "entregas", nombre: "Entregas" }];
-  const S = { tablero: "entregas", vis: new Map(), rut: new Map(), sync: null, sb: null, canal: null, estadoCanal: "", recarga: false, cargando: false, menu: null, abiertos: new Set(), abiertosP: new Set(), filas: [], tRender: null, tFull: null, avisoSync: "", horaAlerta: "07:00" };
-  const F = { fe: { todos: true, sel: new Set(), lista: [] }, vt: { todos: true, sel: new Set(), lista: [] }, cli: { todos: true, sel: new Set(), lista: [] }, usr: { todos: true, sel: new Set(), lista: [] } };
-
-  const esc = (s) => String(s === null || s === undefined ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const norm = (s) => String(s || "").toLowerCase().trim();
-  const toMin = (h) => { if (!h) return NaN; const p = String(h).split(":"); return Number(p[0]) * 60 + Number(p[1]); };
-  const hoyGT = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Guatemala" });
-  const ahoraGT = () => toMin(new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Guatemala" }));
-  const fmtKm = (x) => Number(x).toLocaleString("es-GT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  function fmtHora(s) {
-    if (!s) return "";
-    s = String(s);
-    if (/^\d{1,2}:\d{2}/.test(s)) return s.slice(0, 5);
-    if (/(Z|[+-]\d{2}:?\d{2})$/.test(s)) {
-      const d = new Date(s);
-      if (!isNaN(d)) return d.toLocaleTimeString("es-GT", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Guatemala" });
-    }
-    const m = s.match(/[T ](\d{2}:\d{2})/);
-    return m ? m[1] : s;
-  }
-  function rango() { const d = $("desde").value; return [d, $("hasta").value && $("hasta").value > d ? $("hasta").value : d]; }
-  const enRango = (f) => { const r = rango(); return !!f && f >= r[0] && f <= r[1]; };
+  /* ---------- Modelo: una sola pasada por las visitas ---------- */
   const marcada = (st) => st === "completed" || st === "partial" || st === "failed";
-
-  /* ---------- Filtros (se recuerdan en este equipo) ---------- */
-  const okF = (f, v) => f.todos || f.sel.has(v);
-  function guardarFiltros() {
-    try { localStorage.setItem("ce_filtros", JSON.stringify({ vt: { todos: F.vt.todos, sel: [...F.vt.sel] }, cli: { todos: F.cli.todos, sel: [...F.cli.sel] }, usr: { todos: F.usr.todos, sel: [...F.usr.sel] }, hora: S.horaAlerta, ab: [...S.abiertos], abp: [...S.abiertosP] })); } catch (e) {}
-  }
-  function cargarFiltros() {
-    try {
-      const g = JSON.parse(localStorage.getItem("ce_filtros") || "null"); if (!g) return;
-      ["cli", "usr", "vt"].forEach((k) => { if (g[k]) { F[k].todos = g[k].todos !== false; F[k].sel = new Set(g[k].sel || []); } });
-      if (g.hora) S.horaAlerta = g.hora;
-      S.abiertos = new Set(g.ab || []); S.abiertosP = new Set(g.abp || []);
-    } catch (e) {}
-  }
-  function cambiarFiltro(k, valor, marcado) {
-    const x = F[k];
-    if (valor === "") { x.todos = !!marcado; x.sel = new Set(); }
-    else {
-      if (x.todos) { x.sel = new Set(x.lista); x.todos = false; }
-      if (marcado) x.sel.add(valor); else x.sel.delete(valor);
-      if (x.lista.length && x.lista.every((y) => x.sel.has(y))) { x.todos = true; x.sel = new Set(); }
-    }
-    guardarFiltros(); render();
-  }
-
-  /* ---------- Conexión ---------- */
-  function setEstado(texto, clase) { $("vivoTxt").textContent = texto; $("punto").className = "punto" + (clase ? " " + clase : ""); }
-  function aviso(t) { $("aviso").innerHTML = t ? '<div class="msg">' + esc(t) + "</div>" : ""; }
-  async function traer(tabla, orden) {
-    const r = rango(); let out = [], desde = 0;
-    for (;;) {
-      const { data, error } = await S.sb.from(tabla).select("*").gte("planned_date", r[0]).lte("planned_date", r[1]).order(orden).range(desde, desde + 999);
-      if (error) throw new Error(error.message);
-      out = out.concat(data || []);
-      if (!data || data.length < 1000) break;
-      desde += 1000;
-    }
-    return out;
-  }
-  async function cargarTodo() {
-    if (S.cargando) return;
-    S.cargando = true;
-    window.__onProgreso = (t) => { if (!S.vis.size) aviso(t + " (un día completo puede tardar hasta 30 segundos)"); };
-    if (!S.vis.size) aviso("Cargando las visitas de SimpliRoute… un día completo puede tardar hasta 30 segundos.");
-    try {
-      const r = rango();
-      if (!r[0]) throw new Error("Elige la fecha.");
-      if ((new Date(r[1]) - new Date(r[0])) / 86400000 > 6) throw new Error("Máximo 7 días por consulta.");
-      const [vis, rut, est] = await Promise.all([traer("sr_visitas_dia", "id"), traer("sr_rutas_dia", "route_id"), S.sb.from("sr_sync_estado").select("*").eq("id", 1).maybeSingle()]);
-      S.vis = new Map(vis.map((v) => [String(v.id), v]));
-      S.rut = new Map(rut.map((v) => [String(v.route_id), v]));
-      S.sync = est && est.data ? est.data : null;
-      aviso("");
-      $("tablero").classList.remove("oculto");
-      if (!esConfigurada()) $("aj").open = false;
-      try { const c = $("sbKey").value.trim(); if (c) localStorage.setItem("ce_clave", c); const u = $("urlDatos").value.trim(); if (u) localStorage.setItem("ce_url", u); } catch (e) {}
-      render(); pintarSync();
-      if (window.__cargarPlanes) window.__cargarPlanes().then((n) => { if (n) render(); }).catch(() => {});
-      if (window.__srSinVisitas) aviso("Con este token SimpliRoute solo deja leer las rutas, no las visitas (" + S.rut.size + " rutas). Se muestran las rutas agrupadas por el nombre de su plan (o su lugar de salida), sin tiendas ni entregas ni visit_type. Detalle: " + (window.__srDiag || []).join(" | "));
-      else if (S.vis.size === 0) aviso("SimpliRoute respondió, pero sin visitas para " + r[0] + (r[1] !== r[0] ? " a " + r[1] : "") + ". Prueba otra fecha. Si ese día sí tiene rutas, el usuario del token quizá no tiene acceso a ellas. Detalle: " + (window.__srDiag || []).join(" | "));
-    } catch (e) { if (/clave/i.test(e.message)) { $("aj").open = true; try { localStorage.removeItem("ce_clave"); } catch (x) {} } aviso("No se pudieron leer los datos: " + e.message + ((window.__srDiag || []).length ? "  Detalle: " + window.__srDiag.join(" | ") : "")); }
-    finally { S.cargando = false; }
-  }
-  function aplicar(tipo, p) {
-    if (tipo === "sync") { S.sync = p.new; pintarSync(); return; }
-    const mapa = tipo === "vis" ? S.vis : S.rut, clave = tipo === "vis" ? "id" : "route_id";
-    if (p.eventType === "DELETE") mapa.delete(String(p.old[clave]));
-    else if (enRango(p.new.planned_date)) mapa.set(String(p.new[clave]), p.new);
-    programarRender();
-  }
-  function programarRender() { clearTimeout(S.tRender); S.tRender = setTimeout(render, 300); }
-  function suscribir() {
-    if (S.canal) { try { S.sb.removeChannel(S.canal); } catch (e) {} }
-    S.canal = S.sb.channel("tablero-entregas")
-      .on("postgres_changes", { event: "*", schema: "public", table: "sr_visitas_dia" }, (p) => aplicar("vis", p))
-      .on("postgres_changes", { event: "*", schema: "public", table: "sr_rutas_dia" }, (p) => aplicar("rut", p))
-      .on("postgres_changes", { event: "*", schema: "public", table: "sr_sync_estado" }, (p) => aplicar("sync", p))
-      .subscribe((st) => {
-        S.estadoCanal = st;
-        if (st === "SUBSCRIBED") { setEstado("En vivo", "on"); if (S.recarga) { S.recarga = false; cargarTodo(); } }
-        else if (st === "CHANNEL_ERROR" || st === "TIMED_OUT" || st === "CLOSED") { S.recarga = true; setEstado("Reconectando…", "err"); }
-      });
-  }
-  const esConfigurada = () => false;
-  function conectar() {
-    window.__setClave($("sbKey").value.trim());
-    S.sb = window.supabase.createClient();
-    setEstado("Conectando…", "on");
-    cargarTodo().then(() => { suscribir(); programarRefresco(); });
-  }
-  function programarRefresco() { clearInterval(S.tFull); S.tFull = setInterval(cargarTodo, (Number($("refresco").value) || 300) * 1000); }
-  function pintarSync() {
-    const s = S.sync;
-    if (!s || !s.ultima_sync) { $("ult").textContent = "Esperando la primera sincronización con SimpliRoute"; return; }
-    const seg = Math.max(0, Math.round((Date.now() - new Date(s.ultima_sync).getTime()) / 1000));
-    $("ult").textContent = "SimpliRoute consultado hace " + (seg < 90 ? seg + " s" : Math.round(seg / 60) + " min");
-    $("ult").style.color = seg > 1200 ? "#FFB3A8" : "#BFE3D3";
-    const err = s.mensaje && /^Error/.test(s.mensaje) ? s.mensaje : "";
-    if (err !== S.avisoSync) { S.avisoSync = err; if (err) aviso("La sincronización con SimpliRoute reportó: " + err); else if ($("aviso").textContent.indexOf("sincronización") >= 0) aviso(""); }
-  }
-
-  /* ---------- Clasificación ---------- */
-  function bonito(t) {
-    t = norm(t); if (!t) return "Sin cliente";
-    for (const k of CLAVES) if (t === k || t.indexOf(k + "_") === 0) return NOMBRES[k];
-    const p = t.split("_")[0]; return p.charAt(0).toUpperCase() + p.slice(1);
-  }
-  const clienteDe = (v) => { if (v.cliente) return v.cliente; const t = vtDe(v), n = norm(t); for (const g of GRUPOS) if (n.indexOf(g[0]) === 0) return g[1]; return t; };
-  const usuarioDe = (r) => (r && (r.creado_por || (window.__creadorPlan ? window.__creadorPlan(r.plan_id) : null))) || "Sin usuario";
+  function cliente(v) { const t = v.visit_type || "(sin tipo)", n = norm(t); for (const g of GRUPOS) if (n.indexOf(g[0]) === 0) return g[1]; return t; }
   function estadoDeTexto(st) {
     if (/not.?start|un.?start|pend|plan|creat|draft|new/.test(st)) return "sin";
-    if (/finish|complet|clos|ended|done|final/.test(st)) return "cerrada";
-    if (/start|progress|active|run|transit|ongoing/.test(st)) return "curso";
+    if (/finish|complet|clos|ended|done|final/.test(st)) return "cer";
+    if (/start|progress|active|run|transit|ongoing/.test(st)) return "cur";
     return "";
   }
-  let inferidas = 0;
-  function estadoRuta(r, visitas, marcas) {
-    if (r.end_time || visitas.some((v) => v.is_route_completed === true)) return "cerrada";
-    if (r.start_time) return "curso";
-    const st = norm(r.status) || norm((visitas.find((v) => v.route_status) || {}).route_status);
-    const e = estadoDeTexto(st);
-    if (e) { if (e === "sin" && marcas > 0) { inferidas++; return "curso"; } return e; }
-    return marcas > 0 ? "curso" : "sin";
-  }
-
-  /* ---------- Render ---------- */
-  const ETQ = { fe: "Fecha de visita", cli: "Cliente (visit_type)", vt: "Tipo de visita", usr: "Plan creado por" };
-  const vtDe = (v) => v.visit_type || "(sin tipo)";
-  function pintarCombos(cuentas) {
-    let html = "";
-    ((Object.keys(cuentas.fe || {}).length > 1 ? ["fe"] : []).concat(Object.keys(cuentas.usr || {}).some((u) => u !== "Sin usuario") ? ["cli", "usr"] : ["cli"])).forEach((k) => {
-      const f = F[k], lista = Object.keys(cuentas[k]).sort(); f.lista = lista;
-      const ab = S.menu === k;
-      const texto = f.todos ? "Todos" : (f.sel.size === 0 ? "Ninguno" : (f.sel.size === 1 ? [...f.sel][0] : f.sel.size + " seleccionados"));
-      const op = (v, t, n, on) => '<label class="op"><input type="checkbox" data-f="' + k + '" data-v="' + esc(v) + '"' + (on ? " checked" : "") + "><span>" + esc(t) + "</span>" + (n !== undefined ? "<small>" + n + "</small>" : "") + "</label>";
-      html += '<div class="cb"><span class="tit">' + ETQ[k] + '</span><div class="cb-w"><button type="button" class="cb-b" data-menu="' + k + '" aria-expanded="' + ab + '" aria-haspopup="listbox"><span>' + esc(texto) + "</span><span>▾</span></button>" +
-        (ab ? '<div class="cb-p" role="listbox">' + op("", "Todos", undefined, f.todos) + lista.map((x) => op(x, x, cuentas[k][x], okF(f, x))).join("") + "</div>" : "") + "</div></div>";
+  function construir(D) {
+    const pil = {}, veh = {}, planes = {};
+    (D.conductores || []).forEach((d) => { pil[d.id] = d.name || ((d.first_name || "") + " " + (d.last_name || "")).trim(); });
+    (D.vehiculos || []).forEach((v) => { veh[v.id] = v.license_plate || v.name; });
+    (D.planes || []).forEach((p) => { planes[p.id] = p; });
+    const creador = (pid) => { const x = planes[pid]; if (!x) return null; for (const k in x) if (/owner|creator|created_by|createdby|user|author/i.test(k)) { const v = x[k]; if (v && typeof v === "object") return v.name || v.username || v.email || (v.id != null ? String(v.id) : null); if (v !== null && v !== "") return String(v); } return null; };
+    const R = new Map();
+    (D.rutas || []).forEach((r) => R.set(r.id, { id: r.id, fecha: r.planned_date, status: r.status, start: r.start_time, end: r.end_time, km: num(r.kilometers), driver: r.driver, vehicle: r.vehicle, plan: r.plan, vs: [] }));
+    (D.visitas || []).forEach((v) => {
+      if (!v.route) return;
+      let r = R.get(v.route);
+      if (!r) { r = { id: v.route, fecha: v.planned_date, status: v.route_status, start: null, end: null, km: null, driver: v.driver, vehicle: v.vehicle, plan: null, vs: [] }; R.set(v.route, r); }
+      r.vs.push(v);
     });
-    html += '<div class="cb"><label class="tit" for="horaAlerta">Avisar pilotos sin iniciar desde las</label><input type="time" id="horaAlerta" value="' + esc(S.horaAlerta) + '"></div>';
-    $("combos").innerHTML = html;
+    const rutas = []; let inferidas = 0;
+    R.forEach((r) => {
+      if (!r.vs.length) return;
+      let marcas = 0, cerrada = false, stTxt = "";
+      const grupos = new Map();
+      for (const v of r.vs) {
+        if (marcada(v.status)) marcas++;
+        if (v.is_route_completed === true) cerrada = true;
+        if (!stTxt && v.route_status) stTxt = norm(v.route_status);
+        const c = cliente(v), k = norm(v.title || v.address) + "|" + c;
+        let g = grupos.get(k);
+        if (!g) { g = { t: v.title || v.address || "(sin nombre)", c, vt: v.visit_type || "", n: 0, comp: false, fall: false, h: "", hf: "", m: "", o: Infinity }; grupos.set(k, g); }
+        g.n++; const o = Number(v.order); if (isFinite(o) && o < g.o) g.o = o;
+        if (v.status === "completed" || v.status === "partial") { g.comp = true; const h = horaGT(v.checkout_time || v.checkin_time); if (h && (!g.h || h < g.h)) g.h = h; }
+        else if (v.status === "failed") { g.fall = true; if (!g.hf) g.hf = horaGT(v.checkout_time || v.checkin_time); if (!g.m) g.m = v.checkout_comment || v.checkout_observation || ""; }
+      }
+      const stops = []; const cuentaC = {};
+      grupos.forEach((g) => { stops.push({ t: g.t, c: g.c, n: g.n, e: g.comp ? 1 : (g.fall ? 2 : 0), h: g.comp ? g.h : g.hf, m: g.m, o: g.o }); cuentaC[g.c] = (cuentaC[g.c] || 0) + 1; });
+      stops.sort((a, b) => (a.o - b.o) || a.t.localeCompare(b.t));
+      let est = "";
+      if (r.end || cerrada) est = "cer"; else if (r.start) est = "cur";
+      else { const e = estadoDeTexto(norm(r.status) || stTxt); if (e === "sin" && marcas > 0) { est = "cur"; inferidas++; } else est = e || (marcas > 0 ? "cur" : "sin"); }
+      const drv = r.driver, vh = r.vehicle;
+      const cp = Object.keys(cuentaC).sort((a, b) => cuentaC[b] - cuentaC[a])[0];
+      rutas.push({ id: r.id, fecha: r.fecha, est, piloto: drv ? (pil[drv] || "Piloto SR " + drv) : "", placa: vh ? (veh[vh] || "SR " + vh) : "", creador: creador(r.plan), km: r.km, fin: horaGT(r.end), stops, cp });
+    });
+    return { rutas, inferidas, tienePlanes: Object.keys(planes).length > 0 };
   }
 
-  function tiendasHtml(d) {
-    if (!S.abiertosP.has(String(d.rid)) || window.__srSinVisitas) return "";
-    return '<div class="tiendas">' + d.ps.map((p) => {
-      let cls = "pen", t = "Pendiente";
-      if (p.estado === "completed") { cls = "ok"; t = p.hora || "Entregada"; }
-      else if (p.estado === "failed") { cls = "mal"; t = "No entregada" + (p.motivo ? " (" + p.motivo + ")" : ""); }
-      else if (d.x.est === "cerrada") { cls = "mal"; t = "Sin marcar"; }
-      return '<div class="tn ' + cls + '"><span>' + esc(p.tienda) + (p.visitas.length > 1 ? " (" + p.visitas.length + " pedidos)" : "") + "</span><span>" + esc(t) + "</span></div>";
-    }).join("") + "</div>";
-  }
-  function filaPiloto(d, clase, derecha) {
-    const ab = S.abiertosP.has(String(d.rid));
-    return '<div class="dp' + clase + '" data-rid="' + esc(d.rid) + '" aria-expanded="' + ab + '"><div><b><span class="car">' + (ab ? "▾" : "▸") + "</span>" + esc(d.piloto || "Sin piloto asignado") + "</b><small>" + esc(d.etiqueta) + (clase && d.piloto && d.camion ? "&nbsp;&nbsp;" + esc(d.camion) : "") + '</small></div><div class="d">' + derecha + "</div></div>" + tiendasHtml(d);
-  }
-  function armarParadas(vsSel) {
-      const grupos = {};
-      vsSel.forEach((v) => {
-        const k = norm(v.title || v.address) || ("v" + v.id);
-        const g = grupos[k] = grupos[k] || { tienda: v.title || v.address || "(sin nombre)", visitas: [], orden: Infinity };
-        g.visitas.push(v); const o = Number(v.orden); if (isFinite(o)) g.orden = Math.min(g.orden, o);
+  /* ---------- Cálculo según los filtros ---------- */
+  function calcular() {
+    const F = S.F, M = S.M, rs = [];
+    for (const r of M.rutas) {
+      if (!F.fe.sel.has(r.fecha)) continue;
+      if (!okF(F.usr, r.creador || "Sin usuario")) continue;
+      const st = r.stops.filter((s) => okF(F.cli, s.c));
+      if (st.length) rs.push({ r, st });
+    }
+    const T = { rutas: rs.length, cer: 0, cur: 0, sin: 0, paradas: 0, ent: 0, no: 0, sinPiloto: [], km: 0, kmN: 0 };
+    const porC = new Map();
+    rs.forEach(({ r, st }) => {
+      T[r.est]++;
+      if (!r.piloto) T.sinPiloto.push(r);
+      if (r.est === "cer" && r.km > 0) { T.km += r.km; T.kmN++; }
+      new Set(st.map((s) => s.c)).forEach((c) => {
+        let a = porC.get(c); if (!a) { a = { c, rs: [], cer: 0, cur: 0, sin: 0, paradas: 0, ent: 0, no: 0, km: 0 }; porC.set(c, a); }
+        const sc = st.filter((s) => s.c === c);
+        a.rs.push({ r, st: sc }); a[r.est]++;
+        a.paradas += sc.length;
+        sc.forEach((s) => { if (s.e === 1) a.ent++; else if (s.e === 2 || (s.e === 0 && r.est === "cer")) a.no++; });
+        if (r.cp === c && r.est === "cer" && r.km > 0) a.km += r.km;
       });
-      return Object.values(grupos).map((g) => {
-        const comp = g.visitas.filter((v) => v.status === "completed" || v.status === "partial");
-        const fall = g.visitas.filter((v) => v.status === "failed");
-        let estado = "pending", hora = "", motivo = "";
-        if (comp.length) { estado = "completed"; hora = comp.map((v) => fmtHora(v.checkout_time || v.checkin_time)).filter(Boolean).sort()[0] || ""; }
-        else if (fall.length) { estado = "failed"; hora = fmtHora(fall[0].checkout_time || fall[0].checkin_time); motivo = fall[0].checkout_comment || fall[0].checkout_observation || ""; }
-        return { tienda: g.tienda, orden: g.orden, visitas: g.visitas, estado, hora, motivo };
-      }).sort((a, b) => (a.orden - b.orden) || a.tienda.localeCompare(b.tienda));
-  }
-
-  function render() {
-    inferidas = 0;
-    const raw = Array.from(S.vis.values());
-    const rawPorRuta = {};
-    raw.forEach((v) => { if (v.route_id) (rawPorRuta[v.route_id] = rawPorRuta[v.route_id] || []).push(v); });
-    const cuentaU = {}, cuentaV = {}, cuentaC = {}, cuentaF = {};
-    Object.keys(rawPorRuta).forEach((rid) => {
-      const vs = rawPorRuta[rid], u = usuarioDe(S.rut.get(String(rid)));
-      cuentaU[u] = (cuentaU[u] || 0) + 1;
-      new Set(vs.map((v) => v.planned_date || "")).forEach((d) => { cuentaF[d] = (cuentaF[d] || 0) + 1; });
-      new Set(vs.map(vtDe)).forEach((t) => { cuentaV[t] = (cuentaV[t] || 0) + 1; });
-      new Set(vs.map(clienteDe)).forEach((c) => { cuentaC[c] = (cuentaC[c] || 0) + 1; });
+      st.forEach((s) => { T.paradas++; if (s.e === 1) T.ent++; else if (s.e === 2 || (s.e === 0 && r.est === "cer")) T.no++; });
     });
-    pintarCombos({ fe: cuentaF, usr: cuentaU, vt: cuentaV, cli: cuentaC });
-    const todas = raw.filter((v) => okF(F.vt, vtDe(v)) && okF(F.fe, v.planned_date || ""));
-    const porRutaAll = {};
-    todas.forEach((v) => { if (v.route_id) (porRutaAll[v.route_id] = porRutaAll[v.route_id] || []).push(v); });
+    return { rs, T, porC: [...porC.values()].sort((a, b) => b.rs.length - a.rs.length || a.c.localeCompare(b.c)) };
+  }
 
-    // rutas del usuario elegido, con su estado calculado sobre TODAS sus visitas
-    const info = {};
-    Object.keys(porRutaAll).filter((rid) => okF(F.usr, usuarioDe(S.rut.get(String(rid))))).forEach((rid) => {
-      const vs = porRutaAll[rid], r = S.rut.get(String(rid)) || {};
-      info[rid] = { rid, vs, r, est: estadoRuta(r, vs, vs.filter((v) => marcada(v.status)).length), clientes: [...new Set(vs.map(clienteDe))] };
+  /* ---------- Piezas de pantalla ---------- */
+  function multi(k, titulo, lista, cuentas, f) {
+    const ab = S.menu === k;
+    const txt = f.todos ? "Todos" : (f.sel.size === 0 ? "Ninguno" : (f.sel.size === 1 ? (k === "fe" ? nombreDia([...f.sel][0]) : [...f.sel][0]) : f.sel.size + " seleccionados"));
+    const op = (v, t, n, on) => '<label><input type="checkbox" data-f="' + k + '" data-v="' + esc(v) + '"' + (on ? " checked" : "") + "><span>" + esc(t) + "</span>" + (n !== undefined ? '<span class="ct">' + n + "</span>" : "") + "</label>";
+    return '<div class="campo"><div class="rot">' + titulo + '</div><button type="button" class="msum" data-menu="' + k + '" aria-expanded="' + ab + '" aria-haspopup="listbox">' + esc(txt) + "</button>" +
+      (ab ? '<div class="mpanel"><div class="macc"><button type="button" data-todos="' + k + '">Todos</button><button type="button" data-ninguno="' + k + '">Ninguno</button></div><div class="mlista">' +
+        lista.map((x) => op(x, k === "fe" ? nombreDia(x) : x, cuentas[x], okF(f, x))).join("") + "</div></div>" : "") + "</div>";
+  }
+  function pintarFiltros() {
+    const M = S.M, F = S.F;
+    const cf = {}, cu = {}, cc = {};
+    M.rutas.forEach((r) => { cf[r.fecha] = (cf[r.fecha] || 0) + 1; });
+    M.rutas.filter((r) => F.fe.sel.has(r.fecha)).forEach((r) => { const u = r.creador || "Sin usuario"; cu[u] = (cu[u] || 0) + 1; new Set(r.stops.map((s) => s.c)).forEach((c) => { cc[c] = (cc[c] || 0) + 1; }); });
+    F.fe.lista = Object.keys(cf).sort().reverse(); F.cli.lista = Object.keys(cc).sort(); F.usr.lista = Object.keys(cu).sort();
+    let h = multi("fe", "Fecha", F.fe.lista, cf, F.fe) + multi("cli", "Cliente", F.cli.lista, cc, F.cli);
+    if (Object.keys(cu).some((u) => u !== "Sin usuario")) h += multi("usr", "Plan creado por", F.usr.lista, cu, F.usr);
+    h += '<div class="campo"><label class="rot" for="horaAlerta">Avisar desde las</label><input type="time" id="horaAlerta" value="' + esc(S.horaAlerta) + '"></div>';
+    $("filtros").innerHTML = h;
+  }
+  function barra(pct, clase) { return '<div class="bt"><i class="bf ' + (clase || "") + '" style="width:' + Math.max(0, Math.min(100, pct)).toFixed(1) + '%"></i></div>'; }
+  const rutasTxt = (n) => n + (n === 1 ? " ruta" : " rutas");
+
+  function pintarResumen(C) {
+    const T = C.T, ini = T.cur + T.cer, hoy = hoyGT();
+    const fechas = [...S.F.fe.sel].sort();
+    $("textoSeleccion").textContent = fechas.length ? fechas.map(nombreDia).join(", ") : "Elige una fecha";
+    const llamar = pilotosLlamar(C);
+    $("principales").innerHTML =
+      '<div class="princ"><div class="et">Rutas iniciadas</div><div class="gran">' + fmt(ini) + "<em>de " + fmt(T.rutas) + "</em></div>" + barra(T.rutas ? 100 * ini / T.rutas : 0) +
+        '<div class="bt-pie"><span>' + fmt(T.cer) + " cerradas, " + fmt(T.cur) + ' en curso</span><b>' + (T.rutas ? Math.round(100 * ini / T.rutas) : 0) + "%</b></div></div>" +
+      '<div class="princ"><div class="et">Tiendas entregadas</div><div class="gran">' + fmt(T.ent) + "<em>de " + fmt(T.paradas) + "</em></div>" + barra(T.paradas ? 100 * T.ent / T.paradas : 0, "cer") +
+        '<div class="bt-pie"><span>' + fmt(T.no) + ' no entregadas</span><b>' + (T.paradas ? Math.round(100 * T.ent / T.paradas) : 0) + "%</b></div></div>" +
+      '<div class="princ"><div class="et">Pilotos por llamar</div><div class="gran">' + (llamar === null ? "—" : fmt(llamar.length)) + "<em>" + (llamar === null ? "solo aplica al día de hoy" : "no han iniciado ruta") + "</em></div>" +
+        barra(llamar && T.rutas ? 100 * llamar.length / T.rutas : 0, "sin") + '<div class="bt-pie"><span>' + rutasTxt(T.sin) + ' sin iniciar en total</span></div></div>';
+    $("secundarios").innerHTML =
+      [["Rutas cerradas", fmt(T.cer), ""], ["En curso", fmt(T.cur), ""], ["Sin iniciar", fmt(T.sin), ""], ["Sin piloto asignado", fmt(T.sinPiloto.length), T.sinPiloto.length ? "no se les puede llamar" : ""],
+       ["No entregadas", fmt(T.no), ""], ["Km recorridos", T.kmN ? fmt(Math.round(T.km)) : "—", T.kmN ? rutasTxt(T.kmN) + " cerradas" : "se llena al cerrar"]]
+      .map((k) => '<div class="sec-k"><div class="et">' + k[0] + '</div><div class="num">' + k[1] + '</div><div class="nt">' + esc(k[2]) + "</div></div>").join("");
+  }
+  function pilotosLlamar(C) {
+    const hoy = hoyGT(); if (![...S.F.fe.sel].includes(hoy)) return null;
+    if (ahoraMin() < toMin(S.horaAlerta)) return [];
+    return C.rs.filter(({ r }) => r.est === "sin" && r.piloto && r.fecha === hoy);
+  }
+  function pintarLlamar(C) {
+    const L = pilotosLlamar(C);
+    $("notaLlamar").textContent = L === null ? "" : "Desde las " + S.horaAlerta;
+    if (L === null) { $("llamar").innerHTML = '<div class="vacio">Este aviso solo aplica al día de hoy. Marca la fecha de hoy en el filtro.</div>'; return; }
+    if (ahoraMin() < toMin(S.horaAlerta)) { $("llamar").innerHTML = '<div class="vacio">Todavía no es la hora de aviso (' + esc(S.horaAlerta) + "). Hay " + rutasTxt(C.rs.filter(({ r }) => r.est === "sin" && r.piloto && r.fecha === hoyGT()).length) + " con piloto sin iniciar.</div>"; return; }
+    if (!L.length) { $("llamar").innerHTML = '<div class="listo">Todos los pilotos asignados ya iniciaron su ruta.</div>'; return; }
+    const filas = L.slice().sort((a, b) => a.st[0].c.localeCompare(b.st[0].c) || a.r.piloto.localeCompare(b.r.piloto));
+    $("llamar").innerHTML = '<div class="tw"><div class="rej"><div class="rej-f g-llamar cab"><div>Piloto</div><div>Cliente</div><div>Camión</div><div class="n">Tiendas por visitar</div></div>' +
+      filas.map(({ r, st }) => '<div class="rej-f g-llamar"><div class="nom"><b>' + esc(r.piloto) + "</b></div><div>" + esc([...new Set(st.map((s) => s.c))].join(" y ")) + "</div><div>" + esc(r.placa) + '</div><div class="n">' + fmt(st.length) + "</div></div>").join("") + "</div></div>";
+  }
+  function bandas(a) {
+    const tot = a.cer + a.cur + a.sin || 1;
+    const seg = (n, cls) => n ? '<div class="seg ' + cls + '" style="flex:' + n + ' 1 0" title="' + n + '">' + (100 * n / tot >= 9 ? n : "") + "</div>" : "";
+    return '<div class="bandas">' + seg(a.cer, "cer") + seg(a.cur, "cur") + seg(a.sin, "sin") + "</div>";
+  }
+  function filaPiloto(d, sin) {
+    const ab = S.abiertosP.has(d.r.id + "|" + d.c);
+    const der = sin ? fmt(d.st.length) + (d.st.length === 1 ? " tienda<br>por visitar" : " tiendas<br>por visitar") : (d.r.est === "cer" ? "Cerrada" : "En curso") + "<br>" + d.ent + " de " + d.st.length + " entregadas";
+    let t = "";
+    if (ab) t = '<div class="tiendas">' + d.st.map((s) => { const cls = s.e === 1 ? "ok" : (s.e === 2 || (s.e === 0 && d.r.est === "cer") ? "mal" : ""); const tx = s.e === 1 ? (s.h || "Entregada") : (s.e === 2 ? "No entregada" + (s.m ? " (" + s.m + ")" : "") : (d.r.est === "cer" ? "Sin marcar" : "Pendiente"));
+      return '<div class="tn ' + cls + '"><span>' + esc(s.t) + (s.n > 1 ? " (" + s.n + " pedidos)" : "") + "</span><span>" + esc(tx) + "</span></div>"; }).join("") + "</div>";
+    return '<div role="button" tabindex="0" class="pil' + (sin ? " sin" : "") + '" data-rp="' + esc(d.r.id + "|" + d.c) + '" aria-expanded="' + ab + '"><div><b>' + esc(d.r.piloto || "Sin piloto asignado") + "</b><small>" + esc(d.r.placa ? "Camión " + d.r.placa : "Sin camión") + "</small></div><div class=\"d\">" + der + "</div></div>" + t;
+  }
+  function pintarClientes(C) {
+    if (!C.porC.length) { $("clientes").innerHTML = '<div class="vacio">No hay rutas con estos filtros.</div>'; return; }
+    let h = '<div class="ley"><span><i class="cer"></i>Cerrada</span><span><i class="cur"></i>En curso</span><span><i class="sin"></i>Sin iniciar</span></div><div class="tw"><div class="rej"><div class="rej-f g-cli cab"><div>Cliente</div><div>Rutas</div><div class="n">Iniciadas</div><div class="n">Tiendas entregadas</div><div class="n">No entregadas</div><div class="n">Km</div><div></div></div>';
+    C.porC.forEach((a) => {
+      const ab = S.abiertos.has(a.c), ini = a.cer + a.cur;
+      h += '<div class="rej-f g-cli"><div class="nom"><b>' + esc(a.c) + "</b><small>" + rutasTxt(a.rs.length) + '</small></div><div>' + bandas(a) + '</div><div class="n"><b>' + ini + "</b> de " + a.rs.length + '</div><div class="n">' + fmt(a.ent) + " de " + fmt(a.paradas) + '</div><div class="n">' + (a.no ? '<b style="color:var(--mal)">' + a.no + "</b>" : "0") + '</div><div class="n">' + (a.km ? fmt(Math.round(a.km)) : "—") + '</div><div class="n"><button type="button" class="abrir" data-abrir="' + esc(a.c) + '" aria-expanded="' + ab + '">' + (ab ? "Ocultar pilotos" : "Ver pilotos") + "</button></div></div>";
+      if (ab) {
+        const D = a.rs.map(({ r, st }) => ({ r, st, c: a.c, ent: st.filter((s) => s.e === 1).length }));
+        const nom = (d) => d.r.piloto || "zzz";
+        const sin = D.filter((d) => d.r.est === "sin").sort((x, y) => nom(x).localeCompare(nom(y)));
+        const ya = D.filter((d) => d.r.est !== "sin").sort((x, y) => (x.r.est === y.r.est ? nom(x).localeCompare(nom(y)) : (x.r.est === "cur" ? -1 : 1)));
+        h += '<div class="det"><div><h3>Sin iniciar (' + sin.length + ")</h3>" + (sin.length ? sin.map((d) => filaPiloto(d, true)).join("") : '<div class="vacio">Todas las rutas de este cliente ya salieron.</div>') +
+          "</div><div><h3>Ya iniciaron (" + ya.length + ")</h3>" + (ya.length ? ya.map((d) => filaPiloto(d, false)).join("") : '<div class="vacio">Todavía no sale ninguna.</div>') + "</div></div>";
+      }
     });
-    const rids = Object.keys(info);
-
-    // tarjetas por cliente: rutas creadas / iniciadas
-    const porCli = {};
-    rids.forEach((rid) => info[rid].clientes.forEach((c) => { (porCli[c] = porCli[c] || []).push(info[rid]); }));
-    const clientes = Object.keys(porCli).filter((c) => okF(F.cli, c)).sort();
-    const peso = { cerrada: 0, curso: 1, sin: 2 };
-    $("notaClientes").textContent = "Cada tramo es una ruta creada";
-    $("clientes").innerHTML = (clientes.map((c) => {
-        const L = porCli[c].slice().sort((a, b) => peso[a.est] - peso[b.est]);
-        const ini = L.filter((x) => x.est !== "sin").length, sin = L.length - ini;
-        const segs = L.map((x) => '<i class="seg ' + (x.est === "cerrada" ? "fin" : x.est === "curso" ? "" : "no") + '" title="' + esc((x.r.id_viaje || x.r.placa || String(x.rid).slice(0, 6)) + " — " + (x.r.piloto || "sin piloto") + " — " + { cerrada: "cerrada", curso: "en curso", sin: "sin iniciar" }[x.est]) + '"></i>').join("");
-        const abierto = S.abiertos.has(c);
-        let det = "";
-        if (abierto) {
-          const D = L.map((x) => {
-            const ps = armarParadas(x.vs.filter((v) => clienteDe(v) === c)), r = x.r;
-            const drvId = r.driver_id || (x.vs.find((v) => v.driver_id) || {}).driver_id, vehId = r.vehicle_id || (x.vs.find((v) => v.vehicle_id) || {}).vehicle_id;
-            const camion = r.placa || (vehId ? "SR " + vehId : "");
-            return { x, ps, rid: x.rid, ent: ps.filter((p) => p.estado === "completed").length, tot: ps.length, piloto: r.piloto || (drvId ? "Piloto SR " + drvId : ""),
-                     etiqueta: r.id_viaje || r.reference || (camion ? "Camión " + camion : "Ruta " + String(x.rid).slice(0, 6)), camion };
-          });
-          const nom = (d) => d.piloto || "zzz";
-          const noIni = D.filter((d) => d.x.est === "sin").sort((a, b) => nom(a).localeCompare(nom(b)));
-          const siIni = D.filter((d) => d.x.est !== "sin").sort((a, b) => (a.x.est === b.x.est ? nom(a).localeCompare(nom(b)) : (a.x.est === "curso" ? -1 : 1)));
-          det = '<div class="cli-det"><div class="sub-t">Sin iniciar (' + noIni.length + ")</div>" +
-            (noIni.length ? noIni.map((d) => filaPiloto(d, " no", window.__srSinVisitas ? "Ruta<br>sin iniciar" : d.tot + (d.tot === 1 ? " tienda" : " tiendas") + "<br>por visitar")).join("") : '<div class="vacio">Todas las rutas de este cliente ya iniciaron.</div>') +
-            '<div class="sub-t">Ya iniciaron (' + siIni.length + ")</div>" +
-            (siIni.length ? siIni.map((d) => filaPiloto(d, "", (d.x.est === "cerrada" ? "Cerrada" : "En curso") + (window.__srSinVisitas ? "" : "<br>" + d.ent + " de " + d.tot + " entregadas"))).join("") : '<div class="vacio">Todavía no inicia ninguna.</div>') + "</div>";
-        }
-        return '<div class="cli-wrap"><div class="cli"><span class="cli-n">' + esc(c) + '</span><div class="cinta">' + segs + '</div><div class="cifra"><b>' + ini + "</b> <span>de " + L.length + (L.length === 1 ? " ruta iniciada" : " rutas iniciadas") + '</span><span class="falta' + (sin ? "" : " cero") + '">' + (sin ? sin + " sin iniciar" : "todas iniciadas") + '</span><button type="button" class="abrir" data-abrir="' + esc(c) + '" aria-expanded="' + abierto + '">' + (abierto ? "Ocultar pilotos" : "Ver pilotos") + "</button></div></div>" + det + "</div>";
-      }).join("") || '<div class="vacio">No hay rutas para este día y usuario.</div>');
-
-    // rutas y paradas de los clientes elegidos
-    const filas = rids.map((rid) => {
-      const I = info[rid];
-      const vsSel = I.vs.filter((v) => okF(F.cli, clienteDe(v)));
-      if (!vsSel.length) return null;
-      const paradas = armarParadas(vsSel);
-      const r = I.r, drvId = r.driver_id || (I.vs.find((v) => v.driver_id) || {}).driver_id, vehId = r.vehicle_id || (I.vs.find((v) => v.vehicle_id) || {}).vehicle_id;
-      const camion = r.placa || (vehId ? "SR " + vehId : "");
-      return {
-        rid, r, est: I.est, paradas, camion, idViaje: r.id_viaje || "",
-        piloto: r.piloto || (drvId ? "Piloto SR " + drvId : ""),
-        clientesRuta: [...new Set(vsSel.map(clienteDe))].join(" + "),
-        entregadas: paradas.filter((p) => p.estado === "completed").length,
-        falladas: paradas.filter((p) => p.estado === "failed").length,
-        pend: paradas.filter((p) => p.estado === "pending").length,
-        etiqueta: r.id_viaje || r.reference || (camion ? "Camión " + camion : "Ruta " + String(rid).slice(0, 6))
-      };
-    }).filter(Boolean);
-    const orden = { curso: 0, sin: 1, cerrada: 2 };
-    filas.sort((a, b) => (orden[a.est] - orden[b.est]) || a.etiqueta.localeCompare(b.etiqueta));
-    S.filas = filas;
-    const rIni = filas.filter((f) => f.est !== "sin").length;
-    const totP = filas.reduce((s, f) => s + f.paradas.length, 0), totE = filas.reduce((s, f) => s + f.entregadas, 0);
-    const noE = filas.reduce((s, f) => s + f.falladas + (f.est === "cerrada" ? f.pend : 0), 0);
-    $("resumenTop").innerHTML = window.__srSinVisitas ? '<div class="rt"><div><b>' + rIni + "</b><span>de " + filas.length + (filas.length === 1 ? " ruta iniciada" : " rutas iniciadas") + "</span></div></div>" : '<div class="rt"><div><b>' + rIni + "</b><span>de " + filas.length + (filas.length === 1 ? " ruta iniciada" : " rutas iniciadas") + "</span></div><div><b>" + totE + "</b><span>de " + totP + " paradas entregadas</span></div><div class=\"" + (noE ? "mal" : "") + '"><b>' + noE + "</b><span>no entregadas</span></div></div>";
-    const nombrePiloto = (f) => f.piloto || "Sin piloto";
-
-    // pilotos que no han iniciado ruta
-    const hoy = hoyGT(), esHoy = rango()[1] >= hoy, ahora = ahoraGT(), umbral = toMin(S.horaAlerta);
-    const sinIniciar = filas.filter((f) => f.est === "sin" && f.piloto && f.r.planned_date === hoy);
-    const llamar = (esHoy && ahora >= umbral) ? sinIniciar.slice().sort((a, b) => a.clientesRuta.localeCompare(b.clientesRuta) || a.piloto.localeCompare(b.piloto)) : [];
-    $("notaLlamar").textContent = esHoy ? "Se avisa desde las " + S.horaAlerta : "";
-    $("llamar").innerHTML = !esHoy ? '<div class="vacio">Este aviso solo aplica al día de hoy.</div>'
-      : (ahora < umbral ? '<div class="vacio">Todavía no es la hora de aviso (' + esc(S.horaAlerta) + "). Hay " + sinIniciar.length + " ruta(s) con piloto sin iniciar.</div>"
-      : (llamar.length ? llamar.map((f) => '<div class="p"><div><b>' + esc(f.piloto) + "</b><small>" + esc(f.etiqueta) + "&nbsp;&nbsp;" + esc(f.clientesRuta) + '</small></div><div class="d">' + (window.__srSinVisitas ? "Ruta<br>sin iniciar" : f.paradas.length + (f.paradas.length === 1 ? " tienda" : " tiendas") + "<br>por visitar") + "</div></div>").join("")
-      : '<div class="ok-vacio">Todos los pilotos asignados ya iniciaron su ruta.</div>'));
-    $("sub").textContent = "Entregas: " + (llamar.length ? llamar.length + (llamar.length === 1 ? " piloto sin iniciar ruta" : " pilotos sin iniciar ruta") : "sin pilotos pendientes de iniciar");
-
-    // otras alertas
-    const al = [];
-    filas.forEach((f) => f.paradas.forEach((p) => { if (p.estado === "failed") al.push({ nv: "alto", t: p.tienda + " no entregada", d: f.etiqueta + "  " + nombrePiloto(f) + (p.motivo ? "  " + p.motivo : ""), h: p.hora }); }));
-    const sinPiloto = filas.filter((f) => !f.piloto), sinViaje = filas.filter((f) => !f.idViaje);
-    const cortes = (a) => a.slice(0, 8).map((f) => f.camion || f.etiqueta).join(", ") + (a.length > 8 ? "…" : "");
-    if (sinPiloto.length) al.push({ nv: "medio", t: sinPiloto.length + (sinPiloto.length === 1 ? " ruta sin piloto asignado" : " rutas sin piloto asignado"), d: cortes(sinPiloto), h: "" });
-    const ord = { alto: 0, medio: 1, bajo: 2 }; al.sort((a, b) => ord[a.nv] - ord[b.nv]);
-    $("alertas").innerHTML = al.length ? al.map((a) => '<div class="al"><div style="display:flex"><span class="m ' + a.nv + '"></span><div>' + esc(a.t) + "<small>" + esc(a.d) + '</small></div></div><div class="d">' + esc(a.h) + "</div></div>").join("") : '<div class="vacio">Sin alertas</div>';
-
-    // por liquidar y kilómetros
-    const cer = filas.filter((f) => f.est === "cerrada");
-    const conKm = cer.filter((f) => Number(f.r.kilometers) > 0);
-    const maxKm = Math.max.apply(null, conKm.map((f) => Number(f.r.kilometers)).concat([1]));
-    const totKm = conKm.reduce((s, f) => s + Number(f.r.kilometers), 0);
-    $("km").innerHTML = conKm.length ? conKm.map((f) => '<div class="km"><span>' + esc(f.etiqueta) + '</span><div class="bar"><i style="width:' + (100 * Number(f.r.kilometers) / maxKm).toFixed(1) + '%"></i></div><span class="v">' + fmtKm(f.r.kilometers) + " km</span></div>").join("") + '<div class="km tot"><span>Total</span><span></span><span class="v">' + fmtKm(totKm) + " km</span></div>" : '<div class="vacio">SimpliRoute llena los kilómetros al cerrar cada ruta</div>';
-
-    $("diag").value = diagnostico(todas, rids, filas);
+    $("clientes").innerHTML = h + "</div></div>";
+  }
+  function pintarHoras(C) {
+    const fechas = [...S.F.fe.sel].sort().reverse().slice(0, 3);
+    if (!fechas.length) { $("horas").innerHTML = '<div class="vacio">Elige una fecha.</div>'; return; }
+    const serie = {}; fechas.forEach((f) => { serie[f] = new Array(24).fill(0); });
+    C.rs.forEach(({ r, st }) => { if (!serie[r.fecha]) return; st.forEach((s) => { if (s.e === 1 && s.h) serie[r.fecha][Number(s.h.slice(0, 2))]++; }); });
+    let max = 1, h0 = 24, h1 = 0;
+    fechas.forEach((f) => serie[f].forEach((v, i) => { if (v) { max = Math.max(max, v); h0 = Math.min(h0, i); h1 = Math.max(h1, i); } }));
+    if (h0 > h1) { $("horas").innerHTML = '<div class="vacio">Todavía no hay tiendas marcadas como entregadas.</div>'; return; }
+    h0 = Math.max(0, Math.min(h0, 5)); h1 = Math.min(23, Math.max(h1 + 1, 18));
+    const W = 760, H = 250, pl = 38, pr = 12, pt = 12, pb = 28, ancho = W - pl - pr, alto = H - pt - pb;
+    const techo = Math.max(4, Math.ceil(max / 4) * 4), x = (i) => pl + ancho * (i - h0) / (h1 - h0), y = (v) => pt + alto * (1 - v / techo);
+    let g = ""; for (let k = 0; k <= 4; k++) { const v = techo * k / 4; g += '<line class="eje" stroke="#D6DCD9" stroke-width="1" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" font-size="11" text-anchor="end">' + fmt(Math.round(v)) + "</text>"; }
+    for (let i = h0; i <= h1; i += 2) g += '<text x="' + x(i) + '" y="' + (H - 8) + '" font-size="11" text-anchor="middle">' + i + ":00</text>";
+    const clases = ["l1", "l2", "l3"];
+    fechas.forEach((f, idx) => { let d = ""; for (let i = h0; i <= h1; i++) d += (i === h0 ? "M" : "L") + x(i).toFixed(1) + " " + y(serie[f][i]).toFixed(1) + " "; g += '<path class="' + clases[idx] + '" fill="none" stroke="' + ["#F29100", "#35596E", "#9AA8A3"][idx] + '" stroke-width="' + [2.6, 1.6, 1.4][idx] + '" stroke-linejoin="round" stroke-linecap="round" d="' + d + '"/>'; });
+    const leyenda = fechas.map((f, idx) => '<span><i class="lin" style="background:' + ["var(--naranja)", "var(--c-cerrada)", "var(--punto)"][idx] + '"></i>' + esc(nombreDia(f)) + " (" + fmt(serie[f].reduce((a, b) => a + b, 0)) + ")</span>").join("");
+    $("horas").innerHTML = '<div class="ley">' + leyenda + '</div><svg class="grafica" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Tiendas entregadas por hora">' + g + "</svg>";
+  }
+  function pintarRevisar(C) {
+    const no = []; C.rs.forEach(({ r, st }) => st.forEach((s) => { if (s.e === 2) no.push({ r, s }); }));
+    no.sort((a, b) => (b.s.h || "").localeCompare(a.s.h || ""));
+    $("noEnt").innerHTML = '<div class="tit-g">No entregadas (' + no.length + ")</div>" + (no.length ? no.slice(0, 40).map(({ r, s }) => '<div class="fila-r"><div><b>' + esc(s.t) + "</b><small>" + esc(r.piloto || "Sin piloto") + "</small></div><div>" + esc(s.m || "Sin motivo") + '</div><div class="h">' + esc(s.h) + "</div></div>").join("") + (no.length > 40 ? '<div class="nota">Se muestran las 40 más recientes.</div>' : "") : '<div class="listo">Ninguna tienda marcada como no entregada.</div>');
+    const sp = C.T.sinPiloto;
+    $("sinPiloto").innerHTML = '<div class="tit-g">Rutas sin piloto asignado (' + sp.length + ")</div>" + (sp.length ? sp.slice(0, 40).map((r) => '<div class="fila-r"><div><b>' + esc(r.placa ? "Camión " + r.placa : "Ruta " + r.id.slice(0, 6)) + "</b><small>" + esc(r.stops.map((s) => s.c).filter((c, i, a) => a.indexOf(c) === i).join(" y ")) + "</small></div><div>" + ({ cer: "Cerrada", cur: "En curso", sin: "Sin iniciar" })[r.est] + '</div><div class="h">' + fmt(r.stops.length) + " tiendas</div></div>").join("") : '<div class="listo">Todas las rutas tienen piloto.</div>');
+  }
+  function pintarKm(C) {
+    const L = C.rs.filter(({ r }) => r.est === "cer" && r.km > 0).sort((a, b) => b.r.km - a.r.km);
+    if (!L.length) { $("km").innerHTML = '<div class="vacio">Todavía no hay rutas cerradas con kilómetros.</div>'; return; }
+    const max = L[0].r.km;
+    $("km").innerHTML = L.slice(0, 12).map(({ r }) => '<div class="fila-km"><span>' + esc(r.placa ? "Camión " + r.placa : "Ruta " + r.id.slice(0, 6)) + '</span><div class="mini"><i style="width:' + (100 * r.km / max).toFixed(1) + '%"></i></div><b>' + fmt1(r.km) + " km</b></div>").join("") +
+      '<div class="nota" style="margin-top:10px">' + (L.length > 12 ? "Las 12 con más kilómetros de " + L.length + " rutas cerradas. " : "") + "Total: " + fmt1(C.T.km) + " km.</div>";
+  }
+  function diagnostico(C) {
+    const M = S.M, D = S.datos;
+    const cuenta = (arr, f) => { const o = {}; arr.forEach((x) => { const k = f(x) || "(vacío)"; o[k] = (o[k] || 0) + 1; }); return JSON.stringify(o); };
+    let t = "DIAGNÓSTICO\nDatos generados: " + D.generado + " | fechas publicadas: " + D.fechas.join(", ") + "\nVisitas: " + D.visitas.length + " | rutas: " + D.rutas.length + " | planes: " + (D.planes || []).length + " | rutas armadas: " + M.rutas.length + "\n";
+    t += "Rutas por estado calculado: " + cuenta(M.rutas, (r) => r.est) + " | inferidas por marcas: " + M.inferidas + "\n";
+    t += "Rutas con start_time: " + D.rutas.filter((r) => r.start_time).length + " | con end_time: " + D.rutas.filter((r) => r.end_time).length + " | con kilómetros: " + D.rutas.filter((r) => Number(r.kilometers) > 0).length + "\n";
+    t += "Estados de ruta: " + cuenta(D.rutas, (r) => r.status) + "\nroute_status en visitas: " + cuenta(D.visitas, (v) => v.route_status) + "\nEstados de visita: " + cuenta(D.visitas, (v) => v.status) + "\n";
+    t += "Creadores de plan: " + cuenta(M.rutas, (r) => r.creador) + "\nvisit_type: " + cuenta(D.visitas, (v) => v.visit_type) + "\n";
+    const ej = D.visitas.find((v) => v.checkout_time); t += "Hora de entrega, cruda → mostrada: " + (ej ? ej.checkout_time + " → " + horaGT(ej.checkout_time) : "(ninguna marcada)") + "\n";
+    $("diag").value = t;
   }
 
-  /* ---------- Diagnóstico ---------- */
-  function cuenta(arr, f) { const o = {}; arr.forEach((x) => { const k = f(x) || "(vacío)"; o[k] = (o[k] || 0) + 1; }); return JSON.stringify(o); }
-  function recorta(o) { return JSON.stringify(o, (k, v) => typeof v === "string" && v.length > 100 ? v.slice(0, 100) + "…" : v, 1); }
-  function diagnostico(todas, rids, filas) {
-    const R = Array.from(S.rut.values()), r = rango();
-    let t = "DIAGNÓSTICO TABLERO EN VIVO (Supabase)\nFechas: " + r[0] + (r[1] !== r[0] ? " a " + r[1] : "") + " | clientes: " + (F.cli.todos ? "Todos" : ([...F.cli.sel].join(", ") || "ninguno")) + " | usuarios: " + (F.usr.todos ? "Todos" : ([...F.usr.sel].join(", ") || "ninguno")) + "\n";
-    t += "Respuestas de SimpliRoute: " + ((window.__srDiag || []).join(" | ") || "(ninguna)") + "\n";
-    t += "Canal en vivo: " + (S.estadoCanal || "sin conectar") + " | última sincronización: " + (S.sync ? S.sync.ultima_sync : "ninguna") + " | " + (S.sync ? S.sync.mensaje : "") + "\n";
-    t += "Visitas: " + todas.length + " | rutas del usuario elegido: " + rids.length + " | filas mostradas: " + filas.length + "\n";
-    t += "Clientes (visitas): " + cuenta(todas, clienteDe) + "\nUsuarios creadores (rutas): " + cuenta(R, (x) => x.creado_por) + "\n";
-    t += "Estados de visita: " + cuenta(todas, (v) => v.status) + "\nroute_status en visitas: " + cuenta(todas, (v) => v.route_status) + "\nEstados de ruta: " + cuenta(R, (x) => x.status) + "\n";
-    t += "Rutas por estado calculado: " + cuenta(filas, (f) => f.est) + " | inferidas por marcas: " + inferidas + "\n";
-    t += "Rutas con start_time: " + R.filter((x) => x.start_time).length + " | con end_time: " + R.filter((x) => x.end_time).length + " | con kilometers: " + R.filter((x) => Number(x.kilometers) > 0).length + " | con viaje vinculado: " + R.filter((x) => x.id_viaje).length + " | con piloto: " + R.filter((x) => x.piloto).length + "\n";
-    const ej = todas.find((v) => v.checkout_time);
-    t += "Hora de entrega, crudo → mostrada: " + (ej ? ej.checkout_time + " → " + fmtHora(ej.checkout_time) : "(ninguna visita marcada)") + "\n";
-    const marc = todas.find((v) => v.status === "completed") || todas.find((v) => v.status === "failed");
-    if (marc) t += "\nMUESTRA DE VISITA MARCADA\n" + recorta(marc) + "\n";
-    const rr = R.find((x) => x.start_time || x.end_time) || R[0];
-    if (rr) t += "\nMUESTRA DE RUTA\n" + recorta(rr) + "\n";
-    return t;
+  /* ---------- Pintar todo ---------- */
+  function pintar() {
+    if (!S.M) return;
+    pintarFiltros();
+    const C = calcular();
+    pintarResumen(C); pintarLlamar(C); pintarClientes(C); pintarHoras(C); pintarRevisar(C); pintarKm(C); diagnostico(C);
+    $("subtitulo").textContent = "Entregas del día" + (C.T.rutas ? ": " + fmt(C.T.rutas) + (C.T.rutas === 1 ? " ruta" : " rutas") : "");
   }
+  function pintarEdad() {
+    if (!S.datos) return;
+    const min = Math.max(0, Math.round((Date.now() - Date.parse(S.datos.generado)) / 60000));
+    const txt = min < 1 ? "menos de 1 min" : (min < 90 ? min + " min" : Math.round(min / 60) + " h");
+    $("marcaTiempo").textContent = "Datos de hace " + txt;
+    const viejo = min > 30;
+    $("estado").className = "estado " + (viejo ? "mal" : "ok"); $("estado").textContent = viejo ? "Datos atrasados" : "En vivo";
+    $("pieDatos").textContent = "Fuente: SimpliRoute, se renueva solo cada pocos minutos. Datos generados a las " + horaGT(S.datos.generado) + ".";
+    if (viejo) mostrarAviso("Los datos tienen " + txt + " de atraso. Revisa que el flujo de GitHub siga corriendo (pestaña Actions del repositorio).");
+    else if (S.diagAviso === "viejo") mostrarAviso("");
+    S.diagAviso = viejo ? "viejo" : "";
+  }
+  function mostrarAviso(t) { const a = $("aviso"); a.hidden = !t; a.textContent = t || ""; }
+
+  /* ---------- Carga ---------- */
+  function fechaPorDefecto(D) { const hoy = hoyGT(); return D.fechas.indexOf(hoy) >= 0 ? hoy : D.fechas[D.fechas.length - 1]; }
+  async function cargar(manual) {
+    if (S.cargando) return; S.cargando = true;
+    if (manual) $("estado").textContent = "Actualizando…";
+    try {
+      if (!S.clave) { $("acceso").hidden = false; $("vista").hidden = true; return; }
+      const D = await descifrar(await bajar(), S.clave);
+      S.datos = D; S.M = construir(D); S.tCarga = Date.now();
+      const val = [...S.F.fe.sel].filter((f) => D.fechas.indexOf(f) >= 0);
+      S.F.fe.sel = new Set(val.length ? val : [fechaPorDefecto(D)]);
+      try { localStorage.setItem("tab_clave", S.clave); } catch (e) {}
+      $("acceso").hidden = true; $("vista").hidden = false; $("errAcceso").textContent = "";
+      mostrarAviso(""); pintar(); pintarEdad();
+    } catch (e) {
+      if (e.clave) { try { localStorage.removeItem("tab_clave"); } catch (x) {} S.clave = ""; $("acceso").hidden = false; $("vista").hidden = true; $("errAcceso").textContent = e.message + " Escríbela de nuevo."; $("estado").className = "estado mal"; $("estado").textContent = "Sin acceso"; }
+      else { mostrarAviso(e.message); $("estado").className = "estado mal"; $("estado").textContent = "Sin conexión"; }
+    } finally { S.cargando = false; programar(); }
+  }
+  function programar() { clearTimeout(S.timer); S.timer = setTimeout(() => cargar(false), REFRESCO_MS); }
 
   /* ---------- Eventos ---------- */
-  $("tablero").addEventListener("change", (e) => {
+  function cambiar(k, v, marcado) {
+    const f = S.F[k];
+    if (v === "") { f.todos = !!marcado; f.sel = new Set(); }
+    else { if (f.todos) { f.sel = new Set(f.lista); f.todos = false; } if (marcado) f.sel.add(v); else f.sel.delete(v); if (k !== "fe" && f.lista.length && f.lista.every((y) => f.sel.has(y))) { f.todos = true; f.sel = new Set(); } }
+    guardarPrefs(); pintar();
+  }
+  $("filtros").addEventListener("click", (e) => {
+    const m = e.target.closest("[data-menu]"); if (m) { S.menu = S.menu === m.dataset.menu ? null : m.dataset.menu; pintar(); return; }
+    const t = e.target.closest("[data-todos]"); if (t) { const k = t.dataset.todos, f = S.F[k]; if (k === "fe") { f.sel = new Set(f.lista); } else { f.todos = true; f.sel = new Set(); } guardarPrefs(); pintar(); return; }
+    const n = e.target.closest("[data-ninguno]"); if (n) { const f = S.F[n.dataset.ninguno]; f.todos = false; f.sel = new Set(); guardarPrefs(); pintar(); }
+  });
+  $("filtros").addEventListener("change", (e) => {
     const i = e.target; if (!i) return;
-    if (i.id === "horaAlerta") { if (i.value) { S.horaAlerta = i.value; guardarFiltros(); render(); } return; }
-    if (i.dataset && i.dataset.f !== undefined) cambiarFiltro(i.dataset.f, i.dataset.v, i.checked);
+    if (i.id === "horaAlerta") { if (i.value) { S.horaAlerta = i.value; guardarPrefs(); pintar(); } return; }
+    if (i.dataset && i.dataset.f !== undefined) cambiar(i.dataset.f, i.dataset.v, i.checked);
   });
+  document.addEventListener("click", (e) => { if (S.menu && e.target && e.target.closest && !e.target.closest(".campo")) { S.menu = null; pintar(); } });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.menu) { S.menu = null; pintar(); } });
+  $("clientes").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.closest && e.target.closest("[data-rp]")) { e.preventDefault(); e.target.closest("[data-rp]").click(); } });
   $("clientes").addEventListener("click", (e) => {
-    const p = e.target.closest("[data-rid]");
-    if (p) { const r = p.dataset.rid; if (S.abiertosP.has(r)) S.abiertosP.delete(r); else S.abiertosP.add(r); guardarFiltros(); render(); return; }
+    const p = e.target.closest("[data-rp]"); if (p) { const k = p.dataset.rp; if (S.abiertosP.has(k)) S.abiertosP.delete(k); else S.abiertosP.add(k); guardarPrefs(); pintar(); return; }
     const b = e.target.closest("[data-abrir]"); if (!b) return;
-    const c = b.dataset.abrir; if (S.abiertos.has(c)) S.abiertos.delete(c); else S.abiertos.add(c);
-    guardarFiltros(); render();
+    const c = b.dataset.abrir; if (S.abiertos.has(c)) S.abiertos.delete(c); else S.abiertos.add(c); guardarPrefs(); pintar();
   });
-  $("combos").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-menu]"); if (!b) return;
-    S.menu = S.menu === b.dataset.menu ? null : b.dataset.menu; render();
-  });
-  document.addEventListener("click", (e) => { if (S.menu && e.target && e.target.closest && !e.target.closest(".cb")) { S.menu = null; render(); } });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && S.menu) { S.menu = null; render(); } });
   function pintarTabs() {
     $("tabs").innerHTML = TABLEROS.map((t) => '<button type="button" role="tab" data-t="' + t.id + '" aria-selected="' + (t.id === S.tablero) + '">' + t.nombre + "</button>").join("");
-    if (document.querySelectorAll) document.querySelectorAll("[data-tablero]").forEach((el) => { el.hidden = el.dataset.tablero !== S.tablero; });
+    if (document.querySelectorAll) document.querySelectorAll("[data-tablero]").forEach((el) => { el.hidden = el.dataset.tablero !== S.tablero || !S.clave; });
   }
   $("tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-t]"); if (!b) return; S.tablero = b.dataset.t; pintarTabs(); });
-  pintarTabs();
-  $("btnConectar").addEventListener("click", conectar);
-  $("refresco").addEventListener("change", () => { if (S.sb) programarRefresco(); });
-  $("btnAct").addEventListener("click", () => { if (S.sb) cargarTodo(); else conectar(); });
-  const cambioFechas = () => { F.fe = { todos: true, sel: new Set(), lista: [] }; if (S.sb) cargarTodo(); };
-  $("desde").addEventListener("change", cambioFechas);
-  $("hasta").addEventListener("change", cambioFechas);
-  $("barraFechas").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-rango]"); if (!b) return;
-    const n = Number(b.dataset.rango), hoy = new Date(hoyGT() + "T12:00:00"), f = (d) => d.toLocaleDateString("en-CA");
-    const ini = new Date(hoy), fin = new Date(hoy);
-    if (n === 0) { /* hoy */ } else if (n === -1) { ini.setDate(ini.getDate() - 1); fin.setDate(fin.getDate() - 1); } else { ini.setDate(ini.getDate() - (n - 1)); }
-    $("desde").value = f(ini); $("hasta").value = n > 0 ? f(fin) : "";
-    cambioFechas();
-  });
-  $("btnCopiar").addEventListener("click", () => { const ta = $("diag"); ta.select(); if (navigator.clipboard) navigator.clipboard.writeText(ta.value).catch(() => document.execCommand("copy")); else document.execCommand("copy"); });
-  document.addEventListener("visibilitychange", () => { if (!document.hidden && S.sb && S.estadoCanal !== "SUBSCRIBED") { S.recarga = true; suscribir(); } });
-  setInterval(pintarSync, 1000);
+  $("btnTema").addEventListener("click", () => { const n = temaActual() === "dark" ? "light" : "dark"; aplicarTema(n); try { localStorage.setItem("tab_tema", n); } catch (e) {} pintarBotonTema(); });
+  $("btnAct").addEventListener("click", () => { clearTimeout(S.timer); cargar(true); });
+  function entrar() { const c = $("clave").value.trim(); if (!c) { $("errAcceso").textContent = "Escribe la clave."; return; } S.clave = c; $("errAcceso").textContent = ""; cargar(true); }
+  $("btnEntrar").addEventListener("click", entrar);
+  $("clave").addEventListener("keydown", (e) => { if (e.key === "Enter") entrar(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && S.clave && Date.now() - S.tCarga > REFRESCO_MS) cargar(false); });
+  setInterval(pintarEdad, 30000);
 
-  $("desde").value = hoyGT();
-  cargarFiltros();
-  try { const g = localStorage.getItem("ce_clave"); if (g) $("sbKey").value = g; const u = localStorage.getItem("ce_url"); if (u) $("urlDatos").value = u; } catch (e) {}
-  conectar();
+  /* ---------- Inicio ---------- */
+  try { const t = localStorage.getItem("tab_tema"); if (t) aplicarTema(t); } catch (e) {}
+  pintarBotonTema(); cargarPrefs(); pintarTabs();
+  try { S.clave = localStorage.getItem("tab_clave") || ""; } catch (e) {}
+  if (S.clave) { cargar(false); } else { $("acceso").hidden = false; $("estado").textContent = "Sin acceso"; }
 })();
 </script>
 </body>
